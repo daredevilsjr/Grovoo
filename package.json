@@ -1,0 +1,21 @@
+{
+  "name": "new-app",
+  "version": "1.0.0",
+  "description": "A comprehensive B2B food supply platform similar to Zomato HyperPure, built with MongoDB, Express.js, React, and Node.js.",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "seed": "node scripts/seed-database.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.10"
+  }
+}

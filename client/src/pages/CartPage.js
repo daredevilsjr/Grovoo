@@ -1,0 +1,180 @@
+"use client"
+
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../contexts/AuthContext"
+import { useCart } from "../contexts/CartContext"
+import toast from "react-hot-toast"
+
+const CartPage = () => {
+  const { cart, updateQuantity, removeFromCart, clearCart, getCartTotal } = useCart()
+  const { selectedLocation, user } = useAuth()
+  const [loading, setLoading] = useState(false)
+  const [deliveryAddress, setDeliveryAddress] = useState("")
+  const [notes, setNotes] = useState("")
+  const navigate = useNavigate()
+
+  const subtotal = getCartTotal(selectedLocation)
+  const tax = subtotal * 0.18 // 18% GST
+  const deliveryFee = subtotal > 1000 ? 0 : 50
+  const total = subtotal + tax + deliveryFee
+
+  const handleCheckout = () => {
+    if (!user) {
+      navigate("/login")
+      return
+    }
+
+    if (!deliveryAddress.trim()) {
+      toast.error("Please enter delivery address")
+      return
+    }
+
+    // Navigate to checkout page instead of placing order directly
+    navigate("/checkout")
+  }
+
+  if (cart.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="text-center py-16">
+            <i className="fas fa-shopping-cart text-6xl text-gray-400 mb-6"></i>
+            <h2 className="text-3xl font-semibold text-gray-600 mb-4">Your cart is empty</h2>
+            <p className="text-gray-500 mb-8 text-lg">Looks like you haven't added any items to your cart yet.</p>
+            <button
+              onClick={() => navigate("/products")}
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg font-medium"
+            >
+              <i className="fas fa-shopping-bag mr-2"></i>
+              Start Shopping
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Cart Items */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-md">
+              {cart.map((item) => (
+                <div key={item._id} className="p-6 border-b border-gray-200 last:border-b-0">
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={item.image || "/placeholder.svg?height=80&width=80"}
+                      alt={item.name}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{item.name}</h3>
+                      <p className="text-gray-600 text-sm">{item.category}</p>
+                      <p className="text-green-600 font-semibold">
+                        ₹{item.price[selectedLocation]}/{item.unit}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300"
+                      >
+                        <i className="fas fa-minus text-xs"></i>
+                      </button>
+                      <span className="w-12 text-center font-semibold">{item.quantity}</span>
+                      <button
+                        onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300"
+                      >
+                        <i className="fas fa-plus text-xs"></i>
+                      </button>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold">₹{(item.price[selectedLocation] * item.quantity).toFixed(2)}</p>
+                      <button
+                        onClick={() => removeFromCart(item._id)}
+                        className="text-red-600 hover:text-red-800 text-sm mt-1"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
+              <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
+
+              <div className="space-y-3 mb-4">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>₹{subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>GST (18%)</span>
+                  <span>₹{tax.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Delivery Fee</span>
+                  <span>{deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}</span>
+                </div>
+                <hr />
+                <div className="flex justify-between font-semibold text-lg">
+                  <span>Total</span>
+                  <span>₹{total.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className="space-y-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Address *</label>
+                  <textarea
+                    value={deliveryAddress}
+                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                    rows="3"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter your delivery address"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Order Notes (Optional)</label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    rows="2"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Any special instructions..."
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleCheckout}
+                disabled={!deliveryAddress.trim()}
+                className="w-full bg-green-600 text-white py-4 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors text-lg font-semibold"
+              >
+                <i className="fas fa-arrow-right mr-2"></i>
+                Proceed to Checkout
+              </button>
+
+              <p className="text-xs text-gray-500 mt-3 text-center">Free delivery on orders above ₹1000</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default CartPage
