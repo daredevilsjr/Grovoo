@@ -1,20 +1,25 @@
 "use client"
-import { Navigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
+
+import { Navigate, useLocation } from "react-router-dom"
+import { useAuthStore } from "../store/useStore"
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { user, loading } = useAuth()
+  const { user, loading, isAuthenticated } = useAuthStore()
+  const location = useLocation()
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="loading-spinner"></div>
+        <div className="text-center">
+          <div className="loading-spinner mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
       </div>
     )
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />
+  if (!isAuthenticated || !user) {
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   // Check if admin access is required but user is not admin

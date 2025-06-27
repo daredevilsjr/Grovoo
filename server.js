@@ -28,6 +28,7 @@ app.use("/api/auth", require("./routes/auth"))
 app.use("/api/products", require("./routes/products"))
 app.use("/api/orders", require("./routes/orders"))
 app.use("/api/admin", require("./routes/admin"))
+app.use("/api/upload", require("./routes/upload"))
 
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {

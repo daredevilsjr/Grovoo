@@ -2,11 +2,11 @@
 
 import { useQuery } from "react-query"
 import axios from "axios"
-import { useAuth } from "../contexts/AuthContext"
+import { useAuthStore } from "../store/useStore"
 import toast from "react-hot-toast"
 
 const OrdersPage = () => {
-  const { user } = useAuth()
+  const { user } = useAuthStore()
 
   const {
     data: orders = [],
@@ -16,9 +16,7 @@ const OrdersPage = () => {
   } = useQuery("user-orders", async () => {
     const response = await axios.get("/api/orders/my-orders")
     return response.data
-  }, {
-  enabled: !!user, // Only run query if user exists
-})
+  })
 
   const getStatusColor = (status) => {
     switch (status) {

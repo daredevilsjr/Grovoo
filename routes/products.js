@@ -72,14 +72,35 @@ router.post("/", adminAuth, async (req, res) => {
 // Update product (Admin only)
 router.put("/:id", adminAuth, async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+    const { id } = req.params
+    const updateData = req.body
 
-    if (!product) {
+    // Find the product first
+    const existingProduct = await Product.findById(id)
+    if (!existingProduct) {
       return res.status(404).json({ message: "Product not found" })
     }
 
+    // Update the product
+    const product = await Product.findByIdAndUpdate(
+      id,
+      {
+        ...updateData,
+        updatedAt: new Date(),
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    ).populate("createdBy", "name")
+
     res.json(product)
   } catch (error) {
+    console.error("Update product error:", error)
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((err) => err.message)
+      return res.status(400).json({ message: "Validation error", errors })
+    }
     res.status(500).json({ message: "Server error" })
   }
 })
@@ -95,6 +116,56 @@ router.delete("/:id", adminAuth, async (req, res) => {
 
     res.json({ message: "Product deleted successfully" })
   } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+})
+
+// Bulk update products (Admin only)
+router.patch("/bulk-update", adminAuth, async (req, res) => {
+  try {
+    const { productIds, updateData } = req.body
+
+    if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+      return res.status(400).json({ message: "Product IDs are required" })
+    }
+
+    const result = await Product.updateMany(
+      { _id: { $in: productIds }, isActive: true },
+      { ...updateData, updatedAt: new Date() },
+    )
+
+    res.json({
+      message: `${result.modifiedCount} products updated successfully`,
+      modifiedCount: result.modifiedCount,
+    })
+  } catch (error) {
+    console.error("Bulk update error:", error)
+    res.status(500).json({ message: "Server error" })
+  }
+})
+
+// Update product stock (Admin only)
+router.patch("/:id/stock", adminAuth, async (req, res) => {
+  try {
+    const { stock } = req.body
+
+    if (typeof stock !== "number" || stock < 0) {
+      return res.status(400).json({ message: "Valid stock quantity is required" })
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { stock, updatedAt: new Date() },
+      { new: true, runValidators: true },
+    )
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" })
+    }
+
+    res.json(product)
+  } catch (error) {
+    console.error("Update stock error:", error)
     res.status(500).json({ message: "Server error" })
   }
 })

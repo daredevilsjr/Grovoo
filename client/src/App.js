@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom"
-import { AuthProvider } from "./contexts/AuthContext"
-import { CartProvider } from "./contexts/CartContext"
+import AuthProvider from "./components/AuthProvider"
 import Header from "./components/Header"
 import HomePage from "./pages/HomePage"
 import LoginPage from "./pages/LoginPage"
@@ -17,63 +16,49 @@ import ProtectedRoute from "./components/ProtectedRoute"
 function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <div className="App">
-          <Header />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/products" element={<ProductsPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-
-            <Route
-              path="/cart"
-              element={
-                <ProtectedRoute>
-                  <CartPage />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/checkout"
-              element={
-                <ProtectedRoute>
-                  <CheckoutPage />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/orders"
-              element={
-                <ProtectedRoute>
-                  <OrdersPage />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/order-confirmation/:orderId"
-              element={
-                <ProtectedRoute>
-                  <OrderConfirmationPage />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute adminOnly>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </div>
-      </CartProvider>
+      <div className="App">
+        <Header />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <CheckoutPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <OrdersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/order-confirmation/:orderId"
+            element={
+              <ProtectedRoute>
+                <OrderConfirmationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </div>
     </AuthProvider>
   )
 }

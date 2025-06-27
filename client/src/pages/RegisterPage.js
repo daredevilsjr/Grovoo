@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
+import { useState, useEffect } from "react"
+import { Link, useNavigate, useLocation } from "react-router-dom"
+import { useAuthStore } from "../store/useStore"
+import toast from "react-hot-toast"
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -16,8 +17,17 @@ const RegisterPage = () => {
     location: "mumbai",
   })
   const [loading, setLoading] = useState(false)
-  const { register } = useAuth()
+  const { register, isAuthenticated } = useAuthStore()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || "/"
+      navigate(from, { replace: true })
+    }
+  }, [isAuthenticated, navigate, location])
 
   const handleChange = (e) => {
     setFormData({
@@ -30,7 +40,12 @@ const RegisterPage = () => {
     e.preventDefault()
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!")
+      toast.error("Passwords don't match!")
+      return
+    }
+
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters long!")
       return
     }
 
@@ -39,7 +54,11 @@ const RegisterPage = () => {
     const result = await register(formData)
 
     if (result.success) {
-      navigate("/")
+      toast.success("Registration successful!")
+      const from = location.state?.from?.pathname || "/"
+      navigate(from, { replace: true })
+    } else {
+      toast.error(result.message)
     }
 
     setLoading(false)
@@ -137,10 +156,11 @@ const RegisterPage = () => {
               type="password"
               name="password"
               required
+              minLength="6"
               value={formData.password}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
+              placeholder="Enter your password (min 6 characters)"
             />
           </div>
 

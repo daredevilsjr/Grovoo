@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
+import { useEffect, useState } from "react"
+import { Link, useNavigate, useLocation } from "react-router-dom"
+import { useAuthStore } from "../store/useStore"
+import toast from "react-hot-toast"
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -10,8 +11,17 @@ const LoginPage = () => {
     password: "",
   })
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const { login, isAuthenticated } = useAuthStore()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || "/"
+      navigate(from, { replace: true })
+    }
+  }, [isAuthenticated, navigate, location])
 
   const handleChange = (e) => {
     setFormData({
@@ -27,7 +37,11 @@ const LoginPage = () => {
     const result = await login(formData.email, formData.password)
 
     if (result.success) {
-      navigate("/")
+      toast.success("Login successful!")
+      const from = location.state?.from?.pathname || "/"
+      navigate(from, { replace: true })
+    } else {
+      toast.error(result.message)
     }
 
     setLoading(false)

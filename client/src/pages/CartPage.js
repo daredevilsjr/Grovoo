@@ -1,17 +1,12 @@
 "use client"
 
-import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
-import { useCart } from "../contexts/CartContext"
+import { useAuthStore, useCartStore } from "../store/useStore"
 import toast from "react-hot-toast"
 
 const CartPage = () => {
-  const { cart, updateQuantity, removeFromCart, clearCart, getCartTotal } = useCart()
-  const { selectedLocation, user } = useAuth()
-  const [loading, setLoading] = useState(false)
-  const [deliveryAddress, setDeliveryAddress] = useState("")
-  const [notes, setNotes] = useState("")
+  const { cart, updateQuantity, removeFromCart, getCartTotal, getCartItemsCount } = useCartStore()
+  const { selectedLocation, user } = useAuthStore()
   const navigate = useNavigate()
 
   const subtotal = getCartTotal(selectedLocation)
@@ -21,16 +16,16 @@ const CartPage = () => {
 
   const handleCheckout = () => {
     if (!user) {
+      toast.error("Please login to proceed to checkout")
       navigate("/login")
       return
     }
 
-    if (!deliveryAddress.trim()) {
-      toast.error("Please enter delivery address")
+    if (cart.length === 0) {
+      toast.error("Your cart is empty")
       return
     }
 
-    // Navigate to checkout page instead of placing order directly
     navigate("/checkout")
   }
 
@@ -82,14 +77,14 @@ const CartPage = () => {
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => updateQuantity(item._id, item.quantity - 1)}
-                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300"
+                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors"
                       >
                         <i className="fas fa-minus text-xs"></i>
                       </button>
                       <span className="w-12 text-center font-semibold">{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300"
+                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors"
                       >
                         <i className="fas fa-plus text-xs"></i>
                       </button>
@@ -98,8 +93,9 @@ const CartPage = () => {
                       <p className="font-semibold">₹{(item.price[selectedLocation] * item.quantity).toFixed(2)}</p>
                       <button
                         onClick={() => removeFromCart(item._id)}
-                        className="text-red-600 hover:text-red-800 text-sm mt-1"
+                        className="text-red-600 hover:text-red-800 text-sm mt-1 transition-colors"
                       >
+                        <i className="fas fa-trash mr-1"></i>
                         Remove
                       </button>
                     </div>
@@ -114,9 +110,9 @@ const CartPage = () => {
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
               <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
 
-              <div className="space-y-3 mb-4">
+              <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
-                  <span>Subtotal</span>
+                  <span>Subtotal ({getCartItemsCount()} items)</span>
                   <span>₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
@@ -134,41 +130,25 @@ const CartPage = () => {
                 </div>
               </div>
 
-              <div className="space-y-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Address *</label>
-                  <textarea
-                    value={deliveryAddress}
-                    onChange={(e) => setDeliveryAddress(e.target.value)}
-                    rows="3"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your delivery address"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Order Notes (Optional)</label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    rows="2"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Any special instructions..."
-                  />
-                </div>
-              </div>
-
               <button
                 onClick={handleCheckout}
-                disabled={!deliveryAddress.trim()}
-                className="w-full bg-green-600 text-white py-4 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors text-lg font-semibold"
+                className="w-full bg-green-600 text-white py-4 px-4 rounded-lg hover:bg-green-700 transition-colors text-lg font-semibold"
               >
                 <i className="fas fa-arrow-right mr-2"></i>
                 Proceed to Checkout
               </button>
 
-              <p className="text-xs text-gray-500 mt-3 text-center">Free delivery on orders above ₹1000</p>
+              <div className="mt-4 space-y-2">
+                <p className="text-xs text-gray-500 text-center">Free delivery on orders above ₹1000</p>
+                {subtotal < 1000 && (
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <div className="flex items-center text-blue-700">
+                      <i className="fas fa-info-circle mr-2"></i>
+                      <span className="text-sm">Add ₹{(1000 - subtotal).toFixed(2)} more for free delivery!</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

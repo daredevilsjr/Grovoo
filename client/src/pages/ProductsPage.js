@@ -3,17 +3,18 @@
 import { useState } from "react"
 import { useQuery } from "react-query"
 import axios from "axios"
-import { useAuth } from "../contexts/AuthContext"
-import { useCart } from "../contexts/CartContext"
+import { useAuthStore, useCartStore } from "../store/useStore"
 import toast from "react-hot-toast"
+import { useNavigate } from "react-router-dom"
 
 const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [sortBy, setSortBy] = useState("name")
 
-  const { selectedLocation, user } = useAuth()
-  const { addToCart } = useCart()
+  const { user, selectedLocation } = useAuthStore()
+  const { addToCart } = useCartStore()
+  const navigate = useNavigate()
 
   const {
     data: products = [],
@@ -35,6 +36,7 @@ const ProductsPage = () => {
   const handleAddToCart = (product) => {
     if (!user) {
       toast.error("Please login to add items to cart")
+      navigate("/login")
       return
     }
 
@@ -113,17 +115,29 @@ const ProductsPage = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products.map((product) => (
             <div key={product._id} className="bg-white rounded-lg shadow-md overflow-hidden card-hover">
-              <img
-                src={product.image || "/placeholder.svg?height=200&width=200"}
-                alt={product.name}
-                className="w-full h-48 object-cover"
-              />
+              <div className="relative">
+                <img
+                  src={product.image || "/placeholder.svg?height=200&width=200"}
+                  alt={product.name}
+                  className="w-full h-48 object-cover"
+                />
+                {product.stock <= 5 && product.stock > 0 && (
+                  <div className="absolute top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-medium">
+                    Low Stock
+                  </div>
+                )}
+                {product.stock === 0 && (
+                  <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
+                    Out of Stock
+                  </div>
+                )}
+              </div>
               <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-lg">{product.name}</h3>
                   <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">{product.category}</span>
                 </div>
-                <p className="text-gray-600 text-sm mb-3">{product.description}</p>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-2xl font-bold text-green-600">
                     ₹{product.price[selectedLocation]}/{product.unit}
@@ -135,9 +149,19 @@ const ProductsPage = () => {
                 <button
                   onClick={() => handleAddToCart(product)}
                   disabled={product.stock === 0}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
                 >
-                  {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                  {product.stock === 0 ? (
+                    <>
+                      <i className="fas fa-times-circle mr-2"></i>
+                      Out of Stock
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-cart-plus mr-2"></i>
+                      Add to Cart
+                    </>
+                  )}
                 </button>
               </div>
             </div>

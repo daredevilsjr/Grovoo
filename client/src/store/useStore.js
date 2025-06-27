@@ -1,0 +1,241 @@
+import { create } from "zustand"
+import { persist } from "zustand/middleware"
+import axios from "axios"
+
+// Auth Store
+export const useAuthStore = create(
+  persist(
+    (set, get) => ({
+      user: null,
+      token: null,
+      selectedLocation: "mumbai",
+      loading: true,
+      isAuthenticated: false,
+
+      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setToken: (token) => {
+        set({ token })
+        if (token) {
+          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
+        } else {
+          delete axios.defaults.headers.common["Authorization"]
+        }
+      },
+      setSelectedLocation: (location) => set({ selectedLocation: location }),
+      setLoading: (loading) => set({ loading }),
+
+      login: async (email, password) => {
+        try {
+          set({ loading: true })
+          const response = await axios.post("/api/auth/login", { email, password })
+          const { token, user } = response.data
+
+          // Set token in axios headers
+          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
+
+          set({
+            user,
+            token,
+            isAuthenticated: true,
+            loading: false,
+          })
+
+          return { success: true }
+        } catch (error) {
+          set({ loading: false })
+          const message = error.response?.data?.message || "Login failed"
+          return { success: false, message }
+        }
+      },
+
+      register: async (userData) => {
+        try {
+          set({ loading: true })
+          const response = await axios.post("/api/auth/register", userData)
+          const { token, user } = response.data
+
+          // Set token in axios headers
+          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
+
+          set({
+            user,
+            token,
+            isAuthenticated: true,
+            loading: false,
+          })
+
+          return { success: true }
+        } catch (error) {
+          set({ loading: false })
+          const message = error.response?.data?.message || "Registration failed"
+          return { success: false, message }
+        }
+      },
+
+      logout: () => {
+        delete axios.defaults.headers.common["Authorization"]
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          loading: false,
+        })
+      },
+
+      updateLocation: (location) => {
+        set({ selectedLocation: location })
+      },
+
+      // Initialize auth state
+      initializeAuth: async () => {
+        const { token } = get()
+
+        if (!token) {
+          set({ loading: false, isAuthenticated: false })
+          return
+        }
+
+        try {
+          // Set token in axios headers
+          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
+
+          // Verify token with backend
+          const response = await axios.get("/api/auth/me")
+          const user = response.data.user
+
+          set({
+            user,
+            isAuthenticated: true,
+            loading: false,
+          })
+        } catch (error) {
+          console.error("Token verification failed:", error)
+          // Clear invalid token
+          delete axios.defaults.headers.common["Authorization"]
+          set({
+            user: null,
+            token: null,
+            isAuthenticated: false,
+            loading: false,
+          })
+        }
+      },
+    }),
+    {
+      name: "auth-storage",
+      partialize: (state) => ({
+        token: state.token,
+        selectedLocation: state.selectedLocation,
+      }),
+    },
+  ),
+)
+
+// Cart Store
+export const useCartStore = create(
+  persist(
+    (set, get) => ({
+      cart: [],
+
+      addToCart: (product, quantity = 1) => {
+        const { cart } = get()
+        const existingItem = cart.find((item) => item._id === product._id)
+
+        if (existingItem) {
+          set({
+            cart: cart.map((item) =>
+              item._id === product._id ? { ...item, quantity: item.quantity + quantity } : item,
+            ),
+          })
+        } else {
+          set({ cart: [...cart, { ...product, quantity }] })
+        }
+      },
+
+      removeFromCart: (productId) => {
+        const { cart } = get()
+        set({ cart: cart.filter((item) => item._id !== productId) })
+      },
+
+      updateQuantity: (productId, quantity) => {
+        if (quantity <= 0) {
+          get().removeFromCart(productId)
+        } else {
+          const { cart } = get()
+          set({
+            cart: cart.map((item) => (item._id === productId ? { ...item, quantity } : item)),
+          })
+        }
+      },
+
+      clearCart: () => set({ cart: [] }),
+
+      getCartTotal: (location) => {
+        const { cart } = get()
+        return cart.reduce((total, item) => {
+          return total + item.price[location] * item.quantity
+        }, 0)
+      },
+
+      getCartItemsCount: () => {
+        const { cart } = get()
+        return cart.reduce((total, item) => total + item.quantity, 0)
+      },
+    }),
+    {
+      name: "cart-storage",
+      partialize: (state) => ({ cart: state.cart }),
+    },
+  ),
+)
+
+// Products Store
+export const useProductsStore = create((set, get) => ({
+  products: [],
+  loading: false,
+  error: null,
+  filters: {
+    search: "",
+    category: "all",
+    sortBy: "name",
+  },
+
+  setProducts: (products) => set({ products }),
+  setLoading: (loading) => set({ loading }),
+  setError: (error) => set({ error }),
+
+  setFilters: (filters) => set({ filters: { ...get().filters, ...filters } }),
+
+  addProduct: (product) => {
+    const { products } = get()
+    set({ products: [...products, product] })
+  },
+
+  updateProduct: (productId, updatedProduct) => {
+    const { products } = get()
+    set({
+      products: products.map((product) => (product._id === productId ? updatedProduct : product)),
+    })
+  },
+
+  deleteProduct: (productId) => {
+    const { products } = get()
+    set({ products: products.filter((product) => product._id !== productId) })
+  },
+}))
+
+// UI Store
+export const useUIStore = create((set) => ({
+  showMobileMenu: false,
+  showUserMenu: false,
+  showAddProductModal: false,
+  uploadingImage: false,
+
+  setShowMobileMenu: (show) => set({ showMobileMenu: show }),
+  setShowUserMenu: (show) => set({ showUserMenu: show }),
+  setShowAddProductModal: (show) => set({ showAddProductModal: show }),
+  setUploadingImage: (uploading) => set({ uploadingImage: uploading }),
+
+  toggleMobileMenu: () => set((state) => ({ showMobileMenu: !state.showMobileMenu })),
+  toggleUserMenu: () => set((state) => ({ showUserMenu: !state.showUserMenu })),
+}))

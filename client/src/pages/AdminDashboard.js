@@ -4,10 +4,12 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "react-query"
 import axios from "axios"
 import toast from "react-hot-toast"
+import { useUIStore } from "../store/useStore"
+import ImageUpload from "../components/ImageUpload"
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard")
-  const [showAddProduct, setShowAddProduct] = useState(false)
+  const [editingProduct, setEditingProduct] = useState(null)
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "Vegetables",
@@ -15,8 +17,11 @@ const AdminDashboard = () => {
     stock: 0,
     unit: "kg",
     price: { mumbai: 0, delhi: 0, bangalore: 0 },
+    image: "",
+    imagePublicId: "",
   })
 
+  const { showAddProductModal, setShowAddProductModal } = useUIStore()
   const queryClient = useQueryClient()
 
   // Fetch dashboard data
@@ -46,19 +51,32 @@ const AdminDashboard = () => {
     {
       onSuccess: () => {
         toast.success("Product added successfully!")
-        setShowAddProduct(false)
-        setNewProduct({
-          name: "",
-          category: "Vegetables",
-          description: "",
-          stock: 0,
-          unit: "kg",
-          price: { mumbai: 0, delhi: 0, bangalore: 0 },
-        })
+        setShowAddProductModal(false)
+        resetProductForm()
         queryClient.invalidateQueries("admin-products")
       },
       onError: (error) => {
         const message = error.response?.data?.message || "Failed to add product"
+        toast.error(message)
+      },
+    },
+  )
+
+  // Update product mutation
+  const updateProductMutation = useMutation(
+    async ({ productId, productData }) => {
+      const response = await axios.put(`/api/products/${productId}`, productData)
+      return response.data
+    },
+    {
+      onSuccess: () => {
+        toast.success("Product updated successfully!")
+        setEditingProduct(null)
+        resetProductForm()
+        queryClient.invalidateQueries("admin-products")
+      },
+      onError: (error) => {
+        const message = error.response?.data?.message || "Failed to update product"
         toast.error(message)
       },
     },
@@ -99,9 +117,57 @@ const AdminDashboard = () => {
     },
   )
 
+  const resetProductForm = () => {
+    setNewProduct({
+      name: "",
+      category: "Vegetables",
+      description: "",
+      stock: 0,
+      unit: "kg",
+      price: { mumbai: 0, delhi: 0, bangalore: 0 },
+      image: "",
+      imagePublicId: "",
+    })
+  }
+
   const handleAddProduct = (e) => {
     e.preventDefault()
+
+    if (!newProduct.image) {
+      toast.error("Please upload a product image")
+      return
+    }
+
     addProductMutation.mutate(newProduct)
+  }
+
+  const handleUpdateProduct = (e) => {
+    e.preventDefault()
+
+    if (!newProduct.image) {
+      toast.error("Please upload a product image")
+      return
+    }
+
+    updateProductMutation.mutate({
+      productId: editingProduct._id,
+      productData: newProduct,
+    })
+  }
+
+  const handleEditProduct = (product) => {
+    setEditingProduct(product)
+    setNewProduct({
+      name: product.name,
+      category: product.category,
+      description: product.description,
+      stock: product.stock,
+      unit: product.unit,
+      price: { ...product.price },
+      image: product.image,
+      imagePublicId: product.imagePublicId || "",
+    })
+    setShowAddProductModal(true)
   }
 
   const handleDeleteProduct = (productId) => {
@@ -112,6 +178,20 @@ const AdminDashboard = () => {
 
   const handleUpdateOrderStatus = (orderId, status) => {
     updateOrderStatusMutation.mutate({ orderId, status })
+  }
+
+  const handleImageUpload = (imageUrl, publicId) => {
+    setNewProduct({
+      ...newProduct,
+      image: imageUrl || "",
+      imagePublicId: publicId || "",
+    })
+  }
+
+  const handleCloseModal = () => {
+    setShowAddProductModal(false)
+    setEditingProduct(null)
+    resetProductForm()
   }
 
   const categories = ["Vegetables", "Fruits", "Dairy", "Non-Veg", "Grains", "Spices", "Oils", "Beverages"]
@@ -260,9 +340,14 @@ const AdminDashboard = () => {
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold">Product Management</h2>
                   <button
-                    onClick={() => setShowAddProduct(true)}
+                    onClick={() => {
+                      setEditingProduct(null)
+                      resetProductForm()
+                      setShowAddProductModal(true)
+                    }}
                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                   >
+                    <i className="fas fa-plus mr-2"></i>
                     Add Product
                   </button>
                 </div>
@@ -273,63 +358,61 @@ const AdminDashboard = () => {
                     <p>Loading products...</p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Product
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Category
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Stock
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Price (Mumbai)
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {products.map((product) => (
-                          <tr key={product._id}>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <img
-                                  src={product.image || "/placeholder.svg?height=40&width=40"}
-                                  alt={product.name}
-                                  className="w-10 h-10 rounded-full mr-3"
-                                />
-                                <div>
-                                  <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.category}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {products.map((product) => (
+                      <div key={product._id} className="bg-white border rounded-lg shadow-sm overflow-hidden">
+                        <div className="relative">
+                          <img
+                            src={product.image || "/placeholder.svg?height=200&width=200"}
+                            alt={product.name}
+                            className="w-full h-48 object-cover"
+                          />
+                          {product.stock <= 5 && product.stock > 0 && (
+                            <div className="absolute top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-medium">
+                              Low Stock
+                            </div>
+                          )}
+                          {product.stock === 0 && (
+                            <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
+                              Out of Stock
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-semibold text-lg">{product.name}</h3>
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                              {product.category}
+                            </span>
+                          </div>
+                          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
+                          <div className="flex justify-between items-center mb-3">
+                            <span className="text-lg font-bold text-green-600">₹{product.price.mumbai}</span>
+                            <span className={`text-sm ${product.stock > 10 ? "text-green-600" : "text-red-600"}`}>
                               {product.stock} {product.unit}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              ₹{product.price.mumbai}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <button className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                              <button
-                                onClick={() => handleDeleteProduct(product._id)}
-                                className="text-red-600 hover:text-red-900"
-                                disabled={deleteProductMutation.isLoading}
-                              >
-                                Delete
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                            </span>
+                          </div>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleEditProduct(product)}
+                              className="flex-1 text-blue-600 hover:text-blue-800 text-sm font-medium py-2 px-3 border border-blue-600 rounded hover:bg-blue-50 transition-colors"
+                              disabled={updateProductMutation.isLoading}
+                            >
+                              <i className="fas fa-edit mr-1"></i>
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProduct(product._id)}
+                              className="flex-1 text-red-600 hover:text-red-800 text-sm font-medium py-2 px-3 border border-red-600 rounded hover:bg-red-50 transition-colors"
+                              disabled={deleteProductMutation.isLoading}
+                            >
+                              <i className="fas fa-trash mr-1"></i>
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -385,138 +468,195 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Add Product Modal */}
-      {showAddProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-screen overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Add New Product</h3>
-            <form onSubmit={handleAddProduct} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                <input
-                  type="text"
-                  required
-                  value={newProduct.name}
-                  onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+      {/* Add/Edit Product Modal */}
+      {showAddProductModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-2xl max-h-screen overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">{editingProduct ? "Edit Product" : "Add New Product"}</h3>
+                <button onClick={handleCloseModal} className="text-gray-500 hover:text-gray-700">
+                  <i className="fas fa-times text-xl"></i>
+                </button>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select
-                  value={newProduct.category}
-                  onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea
-                  required
-                  value={newProduct.description}
-                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows="3"
-                ></textarea>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+
+              <form onSubmit={editingProduct ? handleUpdateProduct : handleAddProduct} className="space-y-6">
+                {/* Image Upload */}
+                <ImageUpload onImageUpload={handleImageUpload} currentImage={newProduct.image} />
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newProduct.name}
+                      onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter product name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                    <select
+                      value={newProduct.category}
+                      onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
-                  <input
-                    type="number"
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                  <textarea
                     required
-                    value={newProduct.stock}
-                    onChange={(e) => setNewProduct({ ...newProduct, stock: Number.parseInt(e.target.value) })}
+                    value={newProduct.description}
+                    onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                    rows="3"
+                    placeholder="Enter product description"
+                  ></textarea>
                 </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Stock Quantity *</label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      value={newProduct.stock}
+                      onChange={(e) => setNewProduct({ ...newProduct, stock: Number.parseInt(e.target.value) })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter stock quantity"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+                    <select
+                      value={newProduct.unit}
+                      onChange={(e) => setNewProduct({ ...newProduct, unit: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="kg">Kilogram (kg)</option>
+                      <option value="liter">Liter</option>
+                      <option value="piece">Piece</option>
+                      <option value="gram">Gram</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
-                  <select
-                    value={newProduct.unit}
-                    onChange={(e) => setNewProduct({ ...newProduct, unit: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Prices by City *</label>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-xs text-gray-600 mb-1 block">Mumbai (₹)</label>
+                      <input
+                        type="number"
+                        required
+                        min="0"
+                        step="0.01"
+                        value={newProduct.price.mumbai}
+                        onChange={(e) =>
+                          setNewProduct({
+                            ...newProduct,
+                            price: { ...newProduct.price, mumbai: Number.parseFloat(e.target.value) },
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-600 mb-1 block">Delhi (₹)</label>
+                      <input
+                        type="number"
+                        required
+                        min="0"
+                        step="0.01"
+                        value={newProduct.price.delhi}
+                        onChange={(e) =>
+                          setNewProduct({
+                            ...newProduct,
+                            price: { ...newProduct.price, delhi: Number.parseFloat(e.target.value) },
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-600 mb-1 block">Bangalore (₹)</label>
+                      <input
+                        type="number"
+                        required
+                        min="0"
+                        step="0.01"
+                        value={newProduct.price.bangalore}
+                        onChange={(e) =>
+                          setNewProduct({
+                            ...newProduct,
+                            price: { ...newProduct.price, bangalore: Number.parseFloat(e.target.value) },
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex space-x-4 pt-4">
+                  <button
+                    type="submit"
+                    disabled={
+                      (editingProduct ? updateProductMutation.isLoading : addProductMutation.isLoading) ||
+                      !newProduct.image
+                    }
+                    className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-medium"
                   >
-                    <option value="kg">kg</option>
-                    <option value="liter">liter</option>
-                    <option value="piece">piece</option>
-                    <option value="gram">gram</option>
-                  </select>
+                    {editingProduct ? (
+                      updateProductMutation.isLoading ? (
+                        <>
+                          <div className="loading-spinner mr-2"></div>
+                          Updating Product...
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-save mr-2"></i>
+                          Update Product
+                        </>
+                      )
+                    ) : addProductMutation.isLoading ? (
+                      <>
+                        <div className="loading-spinner mr-2"></div>
+                        Adding Product...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-plus mr-2"></i>
+                        Add Product
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-md hover:bg-gray-400 font-medium"
+                  >
+                    Cancel
+                  </button>
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Prices by City</label>
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className="text-xs text-gray-600">Mumbai</label>
-                    <input
-                      type="number"
-                      required
-                      value={newProduct.price.mumbai}
-                      onChange={(e) =>
-                        setNewProduct({
-                          ...newProduct,
-                          price: { ...newProduct.price, mumbai: Number.parseFloat(e.target.value) },
-                        })
-                      }
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600">Delhi</label>
-                    <input
-                      type="number"
-                      required
-                      value={newProduct.price.delhi}
-                      onChange={(e) =>
-                        setNewProduct({
-                          ...newProduct,
-                          price: { ...newProduct.price, delhi: Number.parseFloat(e.target.value) },
-                        })
-                      }
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600">Bangalore</label>
-                    <input
-                      type="number"
-                      required
-                      value={newProduct.price.bangalore}
-                      onChange={(e) =>
-                        setNewProduct({
-                          ...newProduct,
-                          price: { ...newProduct.price, bangalore: Number.parseFloat(e.target.value) },
-                        })
-                      }
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="flex space-x-3 pt-4">
-                <button
-                  type="submit"
-                  disabled={addProductMutation.isLoading}
-                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center"
-                >
-                  {addProductMutation.isLoading ? <div className="loading-spinner"></div> : "Add Product"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowAddProduct(false)}
-                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}

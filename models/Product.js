@@ -20,6 +20,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    imagePublicId: {
+      type: String,
+      default: "",
+    },
     unit: {
       type: String,
       enum: ["kg", "liter", "piece", "gram"],
@@ -64,5 +68,15 @@ const productSchema = new mongoose.Schema(
 
 // Index for search functionality
 productSchema.index({ name: "text", description: "text" })
+
+// Virtual for checking if product is low stock
+productSchema.virtual("isLowStock").get(function () {
+  return this.stock <= 5 && this.stock > 0
+})
+
+// Virtual for checking if product is out of stock
+productSchema.virtual("isOutOfStock").get(function () {
+  return this.stock === 0
+})
 
 module.exports = mongoose.model("Product", productSchema)

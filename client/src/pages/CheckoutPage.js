@@ -2,14 +2,13 @@
 
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
-import { useCart } from "../contexts/CartContext"
+import { useAuthStore, useCartStore } from "../store/useStore"
 import axios from "axios"
 import toast from "react-hot-toast"
 
 const CheckoutPage = () => {
-  const { cart, clearCart, getCartTotal } = useCart()
-  const { selectedLocation, user } = useAuth()
+  const { cart, clearCart, getCartTotal, getCartItemsCount } = useCartStore()
+  const { selectedLocation, user } = useAuthStore()
   const [loading, setLoading] = useState(false)
   const [orderData, setOrderData] = useState({
     deliveryAddress: user?.address || "",
@@ -41,6 +40,12 @@ const CheckoutPage = () => {
 
     if (!orderData.phone.trim()) {
       toast.error("Please enter phone number")
+      return
+    }
+
+    if (cart.length === 0) {
+      toast.error("Your cart is empty")
+      navigate("/cart")
       return
     }
 
@@ -217,7 +222,7 @@ const CheckoutPage = () => {
               {/* Price Breakdown */}
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
-                  <span>Subtotal ({cart.length} items)</span>
+                  <span>Subtotal ({getCartItemsCount()} items)</span>
                   <span>₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
