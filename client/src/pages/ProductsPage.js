@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { useQuery } from "react-query"
 import axios from "axios"
 import { useAuthStore, useCartStore } from "../store/useStore"
@@ -16,35 +16,70 @@ const ProductsPage = () => {
   const { addToCart } = useCartStore()
   const navigate = useNavigate()
 
+  // Memoize the query key to prevent unnecessary refetches
+  const queryKey = useMemo(
+    () => ["products", searchTerm, selectedCategory, sortBy, selectedLocation],
+    [searchTerm, selectedCategory, sortBy, selectedLocation],
+  )
+
   const {
     data: products = [],
     isLoading,
     error,
-  } = useQuery(["products", searchTerm, selectedCategory, sortBy, selectedLocation], async () => {
-    const params = new URLSearchParams()
-    if (searchTerm) params.append("search", searchTerm)
-    if (selectedCategory !== "all") params.append("category", selectedCategory)
-    if (sortBy) params.append("sort", sortBy)
-    if (selectedLocation) params.append("location", selectedLocation)
+  } = useQuery(
+    queryKey,
+    async () => {
+      const params = new URLSearchParams()
+      if (searchTerm) params.append("search", searchTerm)
+      if (selectedCategory !== "all") params.append("category", selectedCategory)
+      if (sortBy) params.append("sort", sortBy)
+      if (selectedLocation) params.append("location", selectedLocation)
 
-    const response = await axios.get(`/api/products?${params}`)
-    return response.data
-  })
+      const response = await axios.get(`/api/products?${params}`)
+      return response.data
+    },
+    {
+      keepPreviousData: true, // This prevents loading states during search
+      staleTime: 1000, // Cache for 1 second to prevent rapid API calls
+    },
+  )
 
-  const categories = ["all", "Vegetables", "Fruits", "Dairy", "Non-Veg", "Grains", "Spices", "Oils", "Beverages"]
+  const categories = useMemo(
+    () => ["all", "Vegetables", "Fruits", "Dairy", "Non-Veg", "Grains", "Spices", "Oils", "Beverages"],
+    [],
+  )
 
-  const handleAddToCart = (product) => {
-    if (!user) {
-      toast.error("Please login to add items to cart")
-      navigate("/login")
-      return
-    }
+  // Use useCallback to prevent function recreation on every render
+  const handleAddToCart = useCallback(
+    (product) => {
+      if (!user) {
+        toast.error("Please login to add items to cart")
+        navigate("/login")
+        return
+      }
 
-    addToCart(product, 1)
-    toast.success(`${product.name} added to cart!`)
-  }
+      addToCart(product, 1)
+      toast.success(`${product.name} added to cart!`)
+    },
+    [user, addToCart, navigate],
+  )
 
-  if (isLoading) {
+  // Memoize search input handler
+  const handleSearchChange = useCallback((e) => {
+    setSearchTerm(e.target.value)
+  }, [])
+
+  // Memoize category change handler
+  const handleCategoryChange = useCallback((e) => {
+    setSelectedCategory(e.target.value)
+  }, [])
+
+  // Memoize sort change handler
+  const handleSortChange = useCallback((e) => {
+    setSortBy(e.target.value)
+  }, [])
+
+  if (isLoading && !products.length) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 text-center">
@@ -79,7 +114,7 @@ const ProductsPage = () => {
                 type="text"
                 placeholder="Search by name..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearchChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -87,7 +122,7 @@ const ProductsPage = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
               <select
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={handleCategoryChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {categories.map((category) => (
@@ -101,7 +136,7 @@ const ProductsPage = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
+                onChange={handleSortChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="name">Name</option>
@@ -110,6 +145,16 @@ const ProductsPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Loading indicator for search */}
+        {isLoading && products.length > 0 && (
+          <div className="text-center mb-4">
+            <div className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-lg">
+              <div className="loading-spinner mr-2"></div>
+              <span className="text-blue-600">Searching...</span>
+            </div>
+          </div>
+        )}
 
         {/* Products Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -168,7 +213,7 @@ const ProductsPage = () => {
           ))}
         </div>
 
-        {products.length === 0 && (
+        {products.length === 0 && !isLoading && (
           <div className="text-center py-12">
             <i className="fas fa-search text-4xl text-gray-400 mb-4"></i>
             <h3 className="text-xl font-semibold text-gray-600 mb-2">No products found</h3>
