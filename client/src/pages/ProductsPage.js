@@ -6,16 +6,20 @@ import axios from "axios";
 import { useAuthStore, useCartStore } from "../store/useStore";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const ProductsPage = () => {
+  const location = useLocation();
+  const { category } = location.state || {}; 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState(category || "all");
   const [sortBy, setSortBy] = useState("name");
   const [viewMode, setViewMode] = useState("grid");
 
   const { user, selectedLocation } = useAuthStore();
   const { addToCart } = useCartStore();
-  const navigate = useNavigate();
+  const navigate = useNavigate();// may be undefined
+
 
   // Memoize the query key to prevent unnecessary refetches
   const queryKey = useMemo(

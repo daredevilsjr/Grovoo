@@ -13,8 +13,10 @@ import OrderConfirmationPage from "./pages/OrderConfirmationPage"
 import AdminDashboard from "./pages/AdminDashboard"
 import ContactPage from "./pages/ContactPage"
 import ProtectedRoute from "./components/ProtectedRoute"
+import useScrollRestoration from "./hooks/useScrollRestoration"
 
 function App() {
+  useScrollRestoration()
   return (
     <AuthProvider>
       <div className="App flex flex-col min-h-screen">
