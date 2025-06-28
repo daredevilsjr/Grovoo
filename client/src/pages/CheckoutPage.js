@@ -44,7 +44,7 @@ const CheckoutPage = () => {
 
     if (cart.length === 0) {
       toast.error("Your cart is empty")
-      navigate("/cart")
+      navigate("/products")
       return
     }
 
@@ -66,13 +66,14 @@ const CheckoutPage = () => {
 
   const handlePaymentSuccess = (order) => {
     clearCart()
+    console.log("orfder")
     navigate(`/order-confirmation/${order._id}`)
   }
 
-  if (cart.length === 0) {
-    navigate("/cart")
-    return null
-  }
+  // if (cart.length === 0) {
+  //   navigate("/products")
+  //   return null
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">

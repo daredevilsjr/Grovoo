@@ -58,7 +58,6 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
             if (verifyResponse.data.success) {
               toast.success(
                 <div className="flex items-center">
-                  <i className="fas fa-check-circle text-green-500 mr-2"></i>
                   <span>Payment successful!</span>
                 </div>,
               )
@@ -131,7 +130,6 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
 
       toast.success(
         <div className="flex items-center">
-          <i className="fas fa-check-circle text-green-500 mr-2"></i>
           <span>Order placed successfully!</span>
         </div>,
       )

@@ -4,6 +4,7 @@ import { useQuery } from "react-query"
 import axios from "axios"
 import { useAuthStore } from "../store/useStore"
 import toast from "react-hot-toast"
+import { useEffect } from "react"
 
 const OrdersPage = () => {
   const { user } = useAuthStore()
@@ -17,6 +18,10 @@ const OrdersPage = () => {
     const response = await axios.get("/api/orders/my-orders")
     return response.data
   })
+
+  useEffect(() => {
+    refetch()
+  }, [refetch])
 
   const getStatusColor = (status) => {
     switch (status) {
