@@ -56,6 +56,16 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"],
       default: "pending",
     },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "completed", "failed", "refunded"],
+      default: "pending",
+    },
+    paymentMethod: {
+      type: String,
+      enum: ["razorpay", "cod"],
+      default: "razorpay",
+    },
     location: {
       type: String,
       enum: ["mumbai", "delhi", "bangalore"],
@@ -69,6 +79,22 @@ const orderSchema = new mongoose.Schema(
       type: Date,
     },
     notes: {
+      type: String,
+    },
+    // Razorpay specific fields
+    razorpayOrderId: {
+      type: String,
+    },
+    razorpayPaymentId: {
+      type: String,
+    },
+    razorpaySignature: {
+      type: String,
+    },
+    paidAt: {
+      type: Date,
+    },
+    paymentError: {
       type: String,
     },
   },
