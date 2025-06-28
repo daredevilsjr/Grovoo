@@ -1,5 +1,6 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
+import toast from "react-hot-toast";
 import axios from "axios"
 
 // Auth Store
@@ -131,64 +132,6 @@ export const useAuthStore = create(
   ),
 )
 
-// Cart Store
-export const useCartStore = create(
-  persist(
-    (set, get) => ({
-      cart: [],
-
-      addToCart: (product, quantity = 1) => {
-        const { cart } = get()
-        const existingItem = cart.find((item) => item._id === product._id)
-
-        if (existingItem) {
-          set({
-            cart: cart.map((item) =>
-              item._id === product._id ? { ...item, quantity: item.quantity + quantity } : item,
-            ),
-          })
-        } else {
-          set({ cart: [...cart, { ...product, quantity }] })
-        }
-      },
-
-      removeFromCart: (productId) => {
-        const { cart } = get()
-        set({ cart: cart.filter((item) => item._id !== productId) })
-      },
-
-      updateQuantity: (productId, quantity) => {
-        if (quantity <= 0) {
-          get().removeFromCart(productId)
-        } else {
-          const { cart } = get()
-          set({
-            cart: cart.map((item) => (item._id === productId ? { ...item, quantity } : item)),
-          })
-        }
-      },
-
-      clearCart: () => set({ cart: [] }),
-
-      getCartTotal: (location) => {
-        const { cart } = get()
-        return cart.reduce((total, item) => {
-          return total + item.price[location] * item.quantity
-        }, 0)
-      },
-
-      getCartItemsCount: () => {
-        const { cart } = get()
-        return cart.reduce((total, item) => total + item.quantity, 0)
-      },
-    }),
-    {
-      name: "cart-storage",
-      partialize: (state) => ({ cart: state.cart }),
-    },
-  ),
-)
-
 // Products Store
 export const useProductsStore = create((set, get) => ({
   products: [],
@@ -223,6 +166,127 @@ export const useProductsStore = create((set, get) => ({
     set({ products: products.filter((product) => product._id !== productId) })
   },
 }))
+
+export const useCartStore = create(
+  persist(
+    (set, get) => ({
+      cart: [],
+
+      addToCart: (product, quantity = 1) => {
+        const { cart } = get()
+        const existingItem = cart.find((item) => item._id === product._id)
+
+        // Get the latest product stock from products store
+        const products = useProductsStore.getState().products
+        const productInStore = products.find((p) => p._id === product._id)
+
+        // Debug logs
+        if (!productInStore) {
+          console.warn("Product not found in products store:", product._id)
+          return
+        }
+
+        const stock = typeof productInStore.stock === "number" ? productInStore.stock : 0
+
+        // If no stock, do not add
+        if (stock <= 0) {
+          console.warn("Product has no stock:", product._id)
+          return
+        }
+
+        let newQuantity = quantity
+        if (existingItem) {
+          newQuantity = existingItem.quantity + quantity
+        }
+        if (newQuantity > stock) {
+          toast.error("Max Quantity Reached");
+        } else {
+          toast.success(
+            <div className="flex items-center">
+              <span>{product.name} added to cart!</span>
+            </div>
+          );
+        }
+        // Clamp to available stock
+        newQuantity = Math.min(newQuantity, stock)
+
+        // Do not add if clamped quantity is less than 1
+        if (newQuantity < 1) {
+          console.warn("Attempted to add less than 1 quantity:", product._id)
+          return
+        }
+
+        if (existingItem) {
+          set({
+            cart: cart.map((item) =>
+              item._id === product._id ? { ...item, quantity: newQuantity } : item,
+            ),
+          })
+        } else {
+          set({ cart: [...cart, { ...product, quantity: newQuantity }] })
+        }
+      },
+
+      removeFromCart: (productId) => {
+        const { cart } = get()
+        set({ cart: cart.filter((item) => item._id !== productId) })
+      },
+
+      updateQuantity: (productId, quantity) => {
+        const { cart } = get()
+        const products = useProductsStore.getState().products
+        const productInStore = products.find((p) => p._id === productId)
+
+        // Debug logs
+        if (!productInStore) {
+          console.warn("Product not found in products store (update):", productId)
+          get().removeFromCart(productId)
+          return
+        }
+
+        const stock = typeof productInStore.stock === "number" ? productInStore.stock : 0
+
+        // Remove if no stock or requested quantity is less than 1
+        if (stock <= 0 || quantity < 1) {
+          console.warn("No stock or quantity < 1 (update):", productId)
+          get().removeFromCart(productId)
+          return
+        }
+
+        // Clamp quantity to available stock
+        if (quantity >= stock) {
+          toast.error("Max Quantity Reached");
+        }
+        const clampedQuantity = Math.min(quantity, stock)
+
+        set({
+          cart: cart.map((item) =>
+            item._id === productId ? { ...item, quantity: clampedQuantity } : item,
+          ),
+        })
+      },
+
+      clearCart: () => set({ cart: [] }),
+
+      getCartTotal: (location) => {
+        const { cart } = get()
+        return cart.reduce((total, item) => {
+          return total + item.price[location] * item.quantity
+        }, 0)
+      },
+
+      getCartItemsCount: () => {
+        const { cart } = get()
+        return cart.reduce((total, item) => total + item.quantity, 0)
+      },
+    }),
+    {
+      name: "cart-storage",
+      partialize: (state) => ({ cart: state.cart }),
+    },
+  ),
+)
+
 
 // UI Store
 export const useUIStore = create((set) => ({

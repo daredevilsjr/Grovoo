@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useQuery } from "react-query";
 import axios from "axios";
-import { useAuthStore, useCartStore } from "../store/useStore";
+import { useAuthStore, useCartStore, useProductsStore } from "../store/useStore";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
 const ProductsPage = () => {
   const location = useLocation();
-  const { category } = location.state || {}; 
+  const { category } = location.state || {};
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(category || "all");
   const [sortBy, setSortBy] = useState("name");
@@ -119,12 +119,6 @@ const ProductsPage = () => {
       }
 
       addToCart(product, 1);
-      toast.success(
-        <div className="flex items-center">
-          <i className="fas fa-check-circle text-green-500 mr-2"></i>
-          <span>{product.name} added to cart!</span>
-        </div>
-      );
     },
     [user, addToCart, navigate]
   );
@@ -169,6 +163,14 @@ const ProductsPage = () => {
       );
     }
   };
+
+  const setProducts = useProductsStore(state => state.setProducts);
+
+  useEffect(() => {
+    if (products && products.length > 0) {
+      setProducts(products);
+    }
+  }, [products, setProducts]);
 
   if (isLoading && !products.length) {
     return (
@@ -282,22 +284,20 @@ const ProductsPage = () => {
               <div className="flex space-x-2">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`flex-1 py-2 px-4 rounded-xl font-semibold transition-all duration-300 ${
-                    viewMode === "grid"
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
+                  className={`flex-1 py-2 px-4 rounded-xl font-semibold transition-all duration-300 ${viewMode === "grid"
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
                 >
                   <i className="fas fa-th mr-2"></i>
                   Grid
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`flex-1 py-2 px-4 rounded-xl font-semibold transition-all duration-300 ${
-                    viewMode === "list"
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
+                  className={`flex-1 py-2 px-4 rounded-xl font-semibold transition-all duration-300 ${viewMode === "list"
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
                 >
                   <i className="fas fa-list mr-2"></i>
                   List
@@ -314,18 +314,16 @@ const ProductsPage = () => {
               <button
                 key={category.value}
                 onClick={() => handleCategoryChange(category.value)}
-                className={`group flex items-center space-x-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:-translate-y-1 ${
-                  selectedCategory === category.value
-                    ? `bg-gradient-to-r ${category.color} text-white shadow-lg`
-                    : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 hover:shadow-lg"
-                }`}
+                className={`group flex items-center space-x-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:-translate-y-1 ${selectedCategory === category.value
+                  ? `bg-gradient-to-r ${category.color} text-white shadow-lg`
+                  : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 hover:shadow-lg"
+                  }`}
               >
                 <i
-                  className={`${category.icon} ${
-                    selectedCategory === category.value
-                      ? "text-white"
-                      : "text-gray-500"
-                  }`}
+                  className={`${category.icon} ${selectedCategory === category.value
+                    ? "text-white"
+                    : "text-gray-500"
+                    }`}
                 ></i>
                 <span>{category.label}</span>
               </button>
@@ -403,11 +401,10 @@ const ProductsPage = () => {
                       </span>
                     </div>
                     <span
-                      className={`text-sm font-semibold ${
-                        product.stock > 10
-                          ? "text-green-600"
-                          : "text-orange-600"
-                      }`}
+                      className={`text-sm font-semibold ${product.stock > 10
+                        ? "text-green-600"
+                        : "text-orange-600"
+                        }`}
                     >
                       {product.stock} {product.unit} left
                     </span>
@@ -416,11 +413,10 @@ const ProductsPage = () => {
                   <button
                     onClick={() => handleAddToCart(product)}
                     disabled={product.stock === 0}
-                    className={`w-full py-3 px-4 rounded-2xl font-semibold transition-all duration-300 transform hover:-translate-y-1 ${
-                      product.stock === 0
-                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                        : "btn-primary"
-                    }`}
+                    className={`w-full py-3 px-4 rounded-2xl font-semibold transition-all duration-300 transform hover:-translate-y-1 ${product.stock === 0
+                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      : "btn-primary"
+                      }`}
                   >
                     {product.stock === 0 ? (
                       <>
@@ -483,11 +479,10 @@ const ProductsPage = () => {
                           </span>
                         </div>
                         <span
-                          className={`text-sm font-semibold ${
-                            product.stock > 10
-                              ? "text-green-600"
-                              : "text-orange-600"
-                          }`}
+                          className={`text-sm font-semibold ${product.stock > 10
+                            ? "text-green-600"
+                            : "text-orange-600"
+                            }`}
                         >
                           {product.stock} {product.unit} left
                         </span>
@@ -496,11 +491,10 @@ const ProductsPage = () => {
                       <button
                         onClick={() => handleAddToCart(product)}
                         disabled={product.stock === 0}
-                        className={`py-2 px-6 rounded-2xl font-semibold transition-all duration-300 transform hover:-translate-y-1 ${
-                          product.stock === 0
-                            ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                            : "btn-primary"
-                        }`}
+                        className={`py-2 px-6 rounded-2xl font-semibold transition-all duration-300 transform hover:-translate-y-1 ${product.stock === 0
+                          ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                          : "btn-primary"
+                          }`}
                       >
                         {product.stock === 0 ? (
                           <>
