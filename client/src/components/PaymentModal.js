@@ -24,7 +24,9 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
     document.body.appendChild(script)
 
     return () => {
-      document.body.removeChild(script)
+      if (document.body.contains(script)) {
+        document.body.removeChild(script)
+      }
     }
   }, [])
 
@@ -54,7 +56,12 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
             })
 
             if (verifyResponse.data.success) {
-              toast.success("Payment successful!")
+              toast.success(
+                <div className="flex items-center">
+                  <i className="fas fa-check-circle text-green-500 mr-2"></i>
+                  <span>Payment successful!</span>
+                </div>,
+              )
               onSuccess(verifyResponse.data.order)
               onClose()
             }
@@ -79,7 +86,7 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
           location: selectedLocation,
         },
         theme: {
-          color: "#2563eb",
+          color: "#3b82f6",
         },
         modal: {
           ondismiss: () => {
@@ -122,7 +129,12 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
         paymentMethod: "cod",
       })
 
-      toast.success("Order placed successfully!")
+      toast.success(
+        <div className="flex items-center">
+          <i className="fas fa-check-circle text-green-500 mr-2"></i>
+          <span>Order placed successfully!</span>
+        </div>,
+      )
       onSuccess(response.data)
       onClose()
     } catch (error) {
@@ -144,83 +156,103 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-md max-h-screen overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold">Choose Payment Method</h3>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-              <i className="fas fa-times text-xl"></i>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="bg-white rounded-3xl w-full max-w-lg max-h-screen overflow-y-auto shadow-2xl border border-gray-100 animate-slide-up">
+        <div className="p-8">
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Choose Payment Method
+            </h3>
+            <button
+              onClick={onClose}
+              className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+            >
+              <i className="fas fa-times text-gray-600"></i>
             </button>
           </div>
 
           {/* Order Summary */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h4 className="font-medium mb-3">Order Summary</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span>Subtotal ({getCartItemsCount()} items)</span>
-                <span>₹{subtotal.toFixed(2)}</span>
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 mb-8 border border-blue-100">
+            <h4 className="font-bold text-lg text-gray-800 mb-4 flex items-center">
+              <i className="fas fa-receipt mr-2 text-blue-600"></i>
+              Order Summary
+            </h4>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Subtotal ({getCartItemsCount()} items)</span>
+                <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
-                <span>GST (18%)</span>
-                <span>₹{tax.toFixed(2)}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">GST (18%)</span>
+                <span className="font-semibold">₹{tax.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
-                <span>Delivery Fee</span>
-                <span>{deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Delivery Fee</span>
+                <span className="font-semibold">{deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}</span>
               </div>
-              <hr />
-              <div className="flex justify-between font-semibold">
-                <span>Total Amount</span>
-                <span>₹{total.toFixed(2)}</span>
+              <hr className="border-blue-200" />
+              <div className="flex justify-between items-center text-lg">
+                <span className="font-bold text-gray-800">Total Amount</span>
+                <span className="font-bold text-blue-600">₹{total.toFixed(2)}</span>
               </div>
             </div>
           </div>
 
           {/* Payment Methods */}
-          <div className="space-y-4 mb-6">
+          <div className="space-y-4 mb-8">
             <div>
-              <label className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+              <label
+                className={`flex items-center p-6 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-lg ${
+                  paymentMethod === "razorpay"
+                    ? "border-blue-500 bg-gradient-to-r from-blue-50 to-purple-50 shadow-lg"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
                 <input
                   type="radio"
                   name="paymentMethod"
                   value="razorpay"
                   checked={paymentMethod === "razorpay"}
                   onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="mr-3"
+                  className="mr-4 w-5 h-5 text-blue-600"
                 />
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                    <i className="fas fa-credit-card text-blue-600"></i>
+                <div className="flex items-center flex-1">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
+                    <i className="fas fa-credit-card text-white text-lg"></i>
                   </div>
-                  <div>
-                    <div className="font-medium">Online Payment</div>
+                  <div className="flex-1">
+                    <div className="font-bold text-gray-800">Online Payment</div>
                     <div className="text-sm text-gray-600">Credit/Debit Card, UPI, Net Banking</div>
                   </div>
-                </div>
-                <div className="ml-auto">
-                  <img src="https://razorpay.com/assets/razorpay-logo.svg" alt="Razorpay" className="h-6" />
+                  <div className="ml-4">
+                    <img src="https://razorpay.com/assets/razorpay-logo.svg" alt="Razorpay" className="h-8" />
+                  </div>
                 </div>
               </label>
             </div>
 
             <div>
-              <label className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+              <label
+                className={`flex items-center p-6 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-lg ${
+                  paymentMethod === "cod"
+                    ? "border-green-500 bg-gradient-to-r from-green-50 to-emerald-50 shadow-lg"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
                 <input
                   type="radio"
                   name="paymentMethod"
                   value="cod"
                   checked={paymentMethod === "cod"}
                   onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="mr-3"
+                  className="mr-4 w-5 h-5 text-green-600"
                 />
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                    <i className="fas fa-money-bill-wave text-green-600"></i>
+                <div className="flex items-center flex-1">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mr-4">
+                    <i className="fas fa-money-bill-wave text-white text-lg"></i>
                   </div>
-                  <div>
-                    <div className="font-medium">Cash on Delivery</div>
+                  <div className="flex-1">
+                    <div className="font-bold text-gray-800">Cash on Delivery</div>
                     <div className="text-sm text-gray-600">Pay when your order arrives</div>
                   </div>
                 </div>
@@ -230,40 +262,45 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
 
           {/* Security Info */}
           {paymentMethod === "razorpay" && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-4 mb-8">
               <div className="flex items-center text-blue-700">
-                <i className="fas fa-shield-alt mr-2"></i>
-                <span className="text-sm">Your payment is secured by 256-bit SSL encryption</span>
+                <i className="fas fa-shield-alt mr-3 text-lg"></i>
+                <div>
+                  <div className="font-semibold">Secure Payment</div>
+                  <div className="text-sm">Your payment is secured by 256-bit SSL encryption</div>
+                </div>
               </div>
             </div>
           )}
 
           {/* Action Buttons */}
-          <div className="flex space-x-3">
+          <div className="flex space-x-4">
             <button
               onClick={onClose}
-              className="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition-colors font-medium"
+              className="flex-1 bg-gray-100 text-gray-700 py-4 px-6 rounded-2xl font-bold hover:bg-gray-200 transition-all duration-300 transform hover:-translate-y-1"
             >
               Cancel
             </button>
             <button
               onClick={handlePayment}
               disabled={loading}
-              className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors font-medium"
+              className={`flex-1 py-4 px-6 rounded-2xl font-bold transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center ${
+                paymentMethod === "razorpay" ? "btn-primary" : "btn-success"
+              } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
             >
               {loading ? (
                 <>
-                  <div className="loading-spinner mr-2"></div>
+                  <div className="loading-spinner mr-3"></div>
                   Processing...
                 </>
               ) : paymentMethod === "razorpay" ? (
                 <>
-                  <i className="fas fa-credit-card mr-2"></i>
+                  <i className="fas fa-credit-card mr-3"></i>
                   Pay ₹{total.toFixed(2)}
                 </>
               ) : (
                 <>
-                  <i className="fas fa-check-circle mr-2"></i>
+                  <i className="fas fa-check-circle mr-3"></i>
                   Place Order
                 </>
               )}
