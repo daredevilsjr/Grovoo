@@ -97,7 +97,7 @@ const OrderConfirmationPage = () => {
                   <img
                     src={item.product?.image || "/placeholder.svg?height=60&width=60"}
                     alt={item.product?.name || "Product"}
-                    className="w-15 h-15 object-cover rounded"
+                    className="w-10 h-10 object-cover rounded"
                   />
                   <div className="flex-1">
                     <h4 className="font-medium">{item.product?.name || "Product"}</h4>
