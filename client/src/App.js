@@ -14,6 +14,7 @@ import AdminDashboard from "./pages/AdminDashboard"
 import ContactPage from "./pages/ContactPage"
 import ProtectedRoute from "./components/ProtectedRoute"
 import useScrollRestoration from "./hooks/useScrollRestoration"
+import Profile from "./pages/Profile"
 
 function App() {
   useScrollRestoration()
@@ -25,6 +26,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/contact" element={<ContactPage />} />

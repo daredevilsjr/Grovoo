@@ -211,6 +211,14 @@ const Header = () => {
                           <i className="fas fa-list mr-3"></i>
                           My Orders
                         </Link>
+                        <Link
+                          to="/profile"
+                          className="flex items-center px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 transition-all duration-300"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <i className="fas fa-list mr-3"></i>
+                          My Profile
+                        </Link>
                         <button
                           onClick={handleLogout}
                           className="flex items-center w-full px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:text-red-600 transition-all duration-300"
