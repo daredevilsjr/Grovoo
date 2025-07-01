@@ -13,7 +13,7 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
 
   const subtotal = getCartTotal(selectedLocation)
   const tax = subtotal * 0.18
-  const deliveryFee = subtotal > 1000 ? 0 : 50
+  const deliveryFee = subtotal > 1000 ? 0 : 0
   const total = subtotal + tax + deliveryFee
 
   useEffect(() => {
