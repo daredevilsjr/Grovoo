@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import axios from "axios"
 import {
   User,
   Mail,
@@ -55,6 +56,19 @@ export default function Profile() {
     orderUpdates: true,
     marketingEmails: false,
   })
+
+  useEffect(() => {
+    // Simulate fetching profile data from an API
+    const fetchProfileData = async () => {
+      const response = await axios.get("/api/auth/profile");
+      const data = response.data.profile;
+      console.log("Fetched profile data:", data);
+      setProfileData(data);
+    }
+    fetchProfileData().catch((error) => {
+      console.error("Error fetching profile data:", error);
+    });
+  },[])
 
   const [originalData, setOriginalData] = useState({ ...profileData })
 
@@ -121,6 +135,7 @@ export default function Profile() {
   }
 
   const getInitials = (name) => {
+    if(!name) return "N/A"
     return name
       .split(" ")
       .map((n) => n[0])
@@ -382,10 +397,10 @@ export default function Profile() {
               <div className="flex-1 w-full">
                 <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between mb-4">
                   <div className="mb-4 xl:mb-0">
-                    <h1 className="text-2xl font-semibold text-gray-900 mb-2">{profileData.name}</h1>
+                    <h1 className="text-2xl font-semibold text-gray-900 mb-2">{profileData?.name}</h1>
                     <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <Badge className={`${getRoleColor(profileData.role)} flex items-center space-x-1`}>
-                        {getRoleIcon(profileData.role)}
+                      <Badge className={`${getRoleColor(profileData?.role)} flex items-center space-x-1`}>
+                        {getRoleIcon(profileData?.role)}
                         <span className="font-medium">{getDisplayValue("role")}</span>
                       </Badge>
                       <Badge className="text-green-600 border-green-200 bg-green-50">
@@ -396,20 +411,20 @@ export default function Profile() {
                   </div>
 
                   <div className="flex items-center space-x-6">
-                    <StatCard icon={Star} value={profileData.rating} label="Rating" color="yellow" />
-                    <StatCard icon={Award} value={profileData.totalOrders} label="Orders" color="slate" />
+                    <StatCard icon={Star} value={profileData?.rating} label="Rating" color="yellow" />
+                    <StatCard icon={Award} value={profileData?.totalOrders} label="Orders" color="slate" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <InfoCard icon={Mail} label="Email" value={profileData.email} />
-                  <InfoCard icon={Phone} label="Phone" value={profileData.phone} />
+                  <InfoCard icon={Mail} label="Email" value={profileData?.email} />
+                  <InfoCard icon={Phone} label="Phone" value={profileData?.phone} />
                   <InfoCard
                     icon={Calendar}
                     label="Member Since"
-                    value={new Date(profileData.joinDate).toLocaleDateString()}
+                    value={new Date(profileData?.joinDate).toLocaleDateString()}
                   />
-                  <InfoCard icon={Clock} label="Last Active" value={profileData.lastActive} />
+                  <InfoCard icon={Clock} label="Last Active" value={profileData?.lastActive} />
                 </div>
               </div>
             </div>
@@ -436,7 +451,7 @@ export default function Profile() {
                       Full Name
                     </label>
                     <Input
-                      value={profileData.name}
+                      value={profileData?.name}
                       disabled={!isEditing}
                       onChange={(e) => handleInputChange("name", e.target.value)}
                     />
@@ -448,7 +463,7 @@ export default function Profile() {
                       Role
                     </label>
                     <Select
-                      value={profileData.role}
+                      value={profileData?.role}
                       disabled={!isEditing}
                       name="role"
                       options={[
@@ -466,7 +481,7 @@ export default function Profile() {
                     </label>
                     <Input
                       type="email"
-                      value={profileData.email}
+                      value={profileData?.email}
                       disabled={!isEditing}
                       onChange={(e) => handleInputChange("email", e.target.value)}
                     />
@@ -478,7 +493,7 @@ export default function Profile() {
                       Phone Number
                     </label>
                     <Input
-                      value={profileData.phone}
+                      value={profileData?.phone}
                       disabled={!isEditing}
                       onChange={(e) => handleInputChange("phone", e.target.value)}
                     />
@@ -491,7 +506,7 @@ export default function Profile() {
                     Address
                   </label>
                   <Textarea
-                    value={profileData.address}
+                    value={profileData?.address}
                     disabled={!isEditing}
                     onChange={(e) => handleInputChange("address", e.target.value)}
                   />
@@ -518,7 +533,7 @@ export default function Profile() {
                       Business Name
                     </label>
                     <Input
-                      value={profileData.businessName}
+                      value={profileData?.businessName}
                       disabled={!isEditing}
                       onChange={(e) => handleInputChange("businessName", e.target.value)}
                     />
@@ -530,7 +545,7 @@ export default function Profile() {
                       Business Type
                     </label>
                     <Select
-                      value={profileData.businessType}
+                      value={profileData?.businessType}
                       disabled={!isEditing}
                       name="businessType"
                       options={[
@@ -546,7 +561,7 @@ export default function Profile() {
                   <div className="space-y-3 group">
                     <label className="text-sm font-semibold text-gray-700">GST Number</label>
                     <Input
-                      value={profileData.gstNumber}
+                      value={profileData?.gstNumber}
                       disabled={!isEditing}
                       onChange={(e) => handleInputChange("gstNumber", e.target.value)}
                     />
@@ -555,14 +570,14 @@ export default function Profile() {
                   <div className="space-y-3 group">
                     <label className="text-sm font-semibold text-gray-700">License Number</label>
                     <Input
-                      value={profileData.licenseNumber}
+                      value={profileData?.licenseNumber}
                       disabled={!isEditing}
                       onChange={(e) => handleInputChange("licenseNumber", e.target.value)}
                     />
                   </div>
                 </div>
 
-                {profileData.role === "delivery" && (
+                {profileData?.role === "delivery" && (
                   <div className="pt-6 border-t border-gray-200 animate-in slide-in-from-bottom-2">
                     <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
                       <div className="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg mr-3">
@@ -574,7 +589,7 @@ export default function Profile() {
                       <div className="space-y-3 group">
                         <label className="text-sm font-semibold text-gray-700">Vehicle Type</label>
                         <Select
-                          value={profileData.vehicleType}
+                          value={profileData?.vehicleType}
                           disabled={!isEditing}
                           name="vehicleType"
                           options={[
@@ -589,7 +604,7 @@ export default function Profile() {
                       <div className="space-y-3 group">
                         <label className="text-sm font-semibold text-gray-700">Vehicle Number</label>
                         <Input
-                          value={profileData.vehicleNumber}
+                          value={profileData?.vehicleNumber}
                           disabled={!isEditing}
                           onChange={(e) => handleInputChange("vehicleNumber", e.target.value)}
                         />
@@ -598,7 +613,7 @@ export default function Profile() {
                       <div className="space-y-3 group">
                         <label className="text-sm font-semibold text-gray-700">Driving License</label>
                         <Input
-                          value={profileData.drivingLicense}
+                          value={profileData?.drivingLicense}
                           disabled={!isEditing}
                           onChange={(e) => handleInputChange("drivingLicense", e.target.value)}
                         />
@@ -607,7 +622,7 @@ export default function Profile() {
                       <div className="space-y-3 group">
                         <label className="text-sm font-semibold text-gray-700">Delivery Zone</label>
                         <Input
-                          value={profileData.deliveryZone}
+                          value={profileData?.deliveryZone}
                           disabled={!isEditing}
                           onChange={(e) => handleInputChange("deliveryZone", e.target.value)}
                         />
@@ -637,7 +652,7 @@ export default function Profile() {
                       Preferred Language
                     </label>
                     <Select
-                      value={profileData.language}
+                      value={profileData?.language}
                       disabled={!isEditing}
                       name="language"
                       options={[
@@ -655,7 +670,7 @@ export default function Profile() {
                       Timezone
                     </label>
                     <Select
-                      value={profileData.timezone}
+                      value={profileData?.timezone}
                       disabled={!isEditing}
                       name="timezone"
                       options={[

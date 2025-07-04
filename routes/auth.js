@@ -57,14 +57,23 @@ router.post("/register", async (req, res) => {
 // Login
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, phone } = req.body;
 
     // Find user
-    const user = await User.findOne({ email });
+    // console.log("Login attempt with email:", email, "and phone:", phone);
+    if (!email && !phone) {
+      return res.status(400).json({ message: "Email or phone is required" });
+    }
+    let user;
+    if (email) {
+      user = await User.findOne({ email });
+    } else if (phone) {
+      user = await User.findOne({ phone });
+    }
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-
+    console.log("User found:", user);
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
@@ -97,7 +106,7 @@ router.post("/login", async (req, res) => {
 // Get current user
 router.get("/me", auth, async (req, res) => {
   try {
-    res.json({
+    return res.json({
       user: {
         id: req.user._id,
         name: req.user.name,
@@ -107,7 +116,7 @@ router.get("/me", auth, async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -190,13 +199,33 @@ router.post("/reset-password", async (req, res) => {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save();
-    res.status(200).json({ message: "Password reset successfully" });
+    return res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
+  }
+});
+router.get("/profile", auth,  async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    let profile = {};
+    profile.name = user.name;
+    profile.email = user.email;
+    profile.role = user.role;
+    profile.phone = user.phone;
+    profile.address = user.address;
+    profile.location = user.location;
+    profile.gstin = user.gstin;
+    return res.json({profile: profile});
+  } catch (error) {
+    console.error("Profile fetch error:", error);
+    return res.status(500).json({ message: "Server error while fetching profile" });
   }
 });
 

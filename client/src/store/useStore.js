@@ -25,10 +25,10 @@ export const useAuthStore = create(
       setSelectedLocation: (location) => set({ selectedLocation: location }),
       setLoading: (loading) => set({ loading }),
 
-      login: async (email, password) => {
+      login: async (email, password, phone) => {
         try {
           set({ loading: true })
-          const response = await axios.post("/api/auth/login", { email, password })
+          const response = await axios.post("/api/auth/login", { email, password, phone})
           const { token, user } = response.data
 
           // Set token in axios headers
