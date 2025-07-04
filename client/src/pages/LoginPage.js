@@ -1,51 +1,51 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Link, useNavigate, useLocation } from "react-router-dom"
-import { useAuthStore } from "../store/useStore"
-import toast from "react-hot-toast"
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuthStore } from "../store/useStore";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-  })
-  const [loading, setLoading] = useState(false)
-  const { login, isAuthenticated } = useAuthStore()
-  const navigate = useNavigate()
-  const location = useLocation()
+  });
+  const [loading, setLoading] = useState(false);
+  const { login, isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      const from = location.state?.from?.pathname || "/"
-      navigate(from, { replace: true })
+      const from = location.state?.from?.pathname || "/";
+      navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate, location])
+  }, [isAuthenticated, navigate, location]);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
-    const result = await login(formData.email, formData.password)
+    const result = await login(formData.email, formData.password);
 
     if (result.success) {
-      toast.success("Login successful!")
-      const from = location.state?.from?.pathname || "/"
-      navigate(from, { replace: true })
+      toast.success("Login successful!");
+      const from = location.state?.from?.pathname || "/";
+      navigate(from, { replace: true });
     } else {
-      toast.error(result.message)
+      toast.error(result.message);
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
@@ -57,7 +57,9 @@ const LoginPage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email Address
+            </label>
             <input
               type="email"
               name="email"
@@ -70,7 +72,9 @@ const LoginPage = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
             <input
               type="password"
               name="password"
@@ -90,6 +94,14 @@ const LoginPage = () => {
             {loading ? <div className="loading-spinner"></div> : "Sign In"}
           </button>
         </form>
+        <div className="text-sm">
+          <Link
+            to="/forgot-password"
+            className="font-medium text-blue-600 hover:text-blue-500"
+          >
+            Forgot your password?
+          </Link>
+        </div>
 
         <div className="mt-6 text-center">
           <Link to="/register" className="text-blue-600 hover:text-blue-800">
@@ -108,7 +120,7 @@ const LoginPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;

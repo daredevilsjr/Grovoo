@@ -26,6 +26,8 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
+      required: true,
+      unique: true,
       trim: true,
     },
     address: {
@@ -45,6 +47,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    passwordResetToken: {
+      type:String,
+   },
+   passwordResetExpires: {
+      type:Date,
+   },
     deliveryAddresses: [
       {
         label: String, // e.g., "Home", "Work"

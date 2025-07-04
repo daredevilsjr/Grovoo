@@ -15,6 +15,8 @@ import ContactPage from "./pages/ContactPage"
 import ProtectedRoute from "./components/ProtectedRoute"
 import useScrollRestoration from "./hooks/useScrollRestoration"
 import Profile from "./pages/Profile"
+import ForgotPassword from "./pages/ForgotPassword"
+import ResetPassword from "./pages/ResetPassword"
 
 function App() {
   useScrollRestoration()
@@ -31,6 +33,8 @@ function App() {
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/forgot-password/" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route
               path="/checkout"
               element={
