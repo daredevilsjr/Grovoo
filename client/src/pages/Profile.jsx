@@ -24,11 +24,17 @@ import {
   ChevronDown,
   Sparkles,
 } from "lucide-react"
+import toast from "react-hot-toast"
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState({})
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [otp, setOtp] = useState("")
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [verificationError, setVerificationError] = useState(null)
+  const [isVerified, setIsVerified] = useState(false)
 
   const [profileData, setProfileData] = useState({
     name: "Abhinav Singh",
@@ -57,6 +63,49 @@ export default function Profile() {
     marketingEmails: false,
   })
 
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  useEffect(() => {
+    if (profileData?.isEmailVerified) {
+      setIsVerified(true)
+    }
+  }, [profileData])
+
+  const sendOtp = async () => {
+    try {
+      const response = await axios.get("/api/auth/send-otp", { withCredentials: true });
+      console.log("response", response);
+      if (response.data.success) {
+        // setAuthenticationCode(response.data.authenticationCode);
+        setIsDialogOpen(true);
+        console.log("OTP sent successfully");
+      }
+    }
+    catch (err) {
+      setVerificationError("Some Error Occurred. Please try again later.");
+      console.log(err);
+    }
+  }
+
+  const verifyOtp = async () => {
+    setIsVerifying(true)
+    try {
+      const response = await axios.post("/api/auth/verify-otp", { otp }, { withCredentials: true });
+      if (response.data.success) {
+        setOtp("")
+        setIsVerified(true)
+        closeDialog();
+        toast.success("Email verified successfully!");
+      }
+    }
+    catch (error) {
+      console.error("Error verifying email:", error)
+      setVerificationError("Invalid OTP. Please try again.")
+    } finally { setIsVerifying(false); }
+  }
+
   useEffect(() => {
     // Simulate fetching profile data from an API
     const fetchProfileData = async () => {
@@ -68,7 +117,7 @@ export default function Profile() {
     fetchProfileData().catch((error) => {
       console.error("Error fetching profile data:", error);
     });
-  },[])
+  }, [])
 
   const [originalData, setOriginalData] = useState({ ...profileData })
 
@@ -135,7 +184,7 @@ export default function Profile() {
   }
 
   const getInitials = (name) => {
-    if(!name) return "N/A"
+    if (!name) return "N/A"
     return name
       .split(" ")
       .map((n) => n[0])
@@ -193,11 +242,10 @@ export default function Profile() {
         onChange={onChange}
         disabled={disabled}
         placeholder={placeholder}
-        className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${
-          disabled
-            ? "bg-gray-50 border-gray-200 text-gray-500"
-            : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-        } ${className}`}
+        className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${disabled
+          ? "bg-gray-50 border-gray-200 text-gray-500"
+          : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+          } ${className}`}
       />
     )
   }
@@ -210,11 +258,10 @@ export default function Profile() {
         disabled={disabled}
         placeholder={placeholder}
         rows={4}
-        className={`w-full px-3 py-2.5 border rounded-lg transition-all duration-200 resize-none ${
-          disabled
-            ? "bg-gray-50 border-gray-200 text-gray-500"
-            : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-        } ${className}`}
+        className={`w-full px-3 py-2.5 border rounded-lg transition-all duration-200 resize-none ${disabled
+          ? "bg-gray-50 border-gray-200 text-gray-500"
+          : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+          } ${className}`}
       />
     )
   }
@@ -228,11 +275,10 @@ export default function Profile() {
           type="button"
           onClick={() => !disabled && toggleDropdown(name)}
           disabled={disabled}
-          className={`w-full h-11 px-3 border rounded-lg flex items-center justify-between transition-all duration-200 ${
-            disabled
-              ? "bg-gray-50 border-gray-200 text-gray-500"
-              : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-          }`}
+          className={`w-full h-11 px-3 border rounded-lg flex items-center justify-between transition-all duration-200 ${disabled
+            ? "bg-gray-50 border-gray-200 text-gray-500"
+            : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+            }`}
         >
           <span>{getDisplayValue(name) || placeholder}</span>
           <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
@@ -262,16 +308,14 @@ export default function Profile() {
         type="button"
         onClick={() => !disabled && onChange(!checked)}
         disabled={disabled}
-        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 transform hover:scale-105 ${
-          checked
-            ? "bg-gradient-to-r from-purple-500 to-indigo-600 shadow-lg shadow-purple-200"
-            : "bg-gray-300 hover:bg-gray-400"
-        } ${disabled ? "opacity-50 cursor-not-allowed hover:scale-100" : "cursor-pointer"}`}
+        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 transform hover:scale-105 ${checked
+          ? "bg-gradient-to-r from-purple-500 to-indigo-600 shadow-lg shadow-purple-200"
+          : "bg-gray-300 hover:bg-gray-400"
+          } ${disabled ? "opacity-50 cursor-not-allowed hover:scale-100" : "cursor-pointer"}`}
       >
         <span
-          className={`inline-block h-5 w-5 transform rounded-full bg-white transition-all duration-300 shadow-lg ${
-            checked ? "translate-x-6 shadow-purple-200" : "translate-x-1"
-          }`}
+          className={`inline-block h-5 w-5 transform rounded-full bg-white transition-all duration-300 shadow-lg ${checked ? "translate-x-6 shadow-purple-200" : "translate-x-1"
+            }`}
         />
       </button>
     )
@@ -422,9 +466,9 @@ export default function Profile() {
                   <InfoCard
                     icon={Calendar}
                     label="Member Since"
-                    value={new Date(profileData?.joinDate).toLocaleDateString()}
+                    value={new Date(profileData?.joined).toLocaleDateString()}
                   />
-                  <InfoCard icon={Clock} label="Last Active" value={profileData?.lastActive} />
+                  {/* <InfoCard icon={Clock} label="Last Active" value={profileData?.lastActive} /> */}
                 </div>
               </div>
             </div>
@@ -479,6 +523,15 @@ export default function Profile() {
                       <Mail className="w-4 h-4 mr-2 text-purple-600" />
                       Email Address
                     </label>
+                    <button
+                      onClick={() => {
+                        sendOtp();
+                        setIsDialogOpen((p) => !p);
+                      }}
+                      disabled={isVerified || isVerifying}
+                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isVerified
+                        ? "bg-green-100 text-green-600 cursor-not-allowed" : "bg-blue-100 text-blue-600 hover:bg-blue-200"}`}
+                    >{isVerified ? "Verified" : "Not Verified"}</button>
                     <Input
                       type="email"
                       value={profileData?.email}
@@ -486,6 +539,57 @@ export default function Profile() {
                       onChange={(e) => handleInputChange("email", e.target.value)}
                     />
                   </div>
+                  {isDialogOpen && (
+                    <div
+                      className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"
+                      onClick={closeDialog}
+                    >
+                      <div
+                        className="bg-white text-gray-800 rounded-xl shadow-xl p-6 w-full max-w-sm relative"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          onClick={closeDialog}
+                          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl"
+                        >
+                          ✖
+                        </button>
+
+                        <h2 className="text-lg font-semibold mb-4 text-center">Verify Your Email</h2>
+
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            verifyOtp(); // your OTP verification logic
+                          }}
+                          className="space-y-4"
+                        >
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Enter OTP sent to {profileData?.email}
+                            </label>
+                            <input
+                              type="text"
+                              value={otp}
+                              onChange={(e) => setOtp(e.target.value)}
+                              disabled={isVerifying}
+                              required
+                              placeholder="Enter OTP Code"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                            />
+                          </div>
+                          {verificationError && <div>{JSON.stringify(verificationError)}</div>}
+                          <button
+                            type="submit"
+                            disabled={isVerifying}
+                            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                          >
+                            {isVerifying ? "Verifying..." : "Verify Email"}
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-3 group">
                     <label className="text-sm font-semibold text-gray-700 flex items-center">

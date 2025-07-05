@@ -34,6 +34,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    otp: {
+      type: String,
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
     location: {
       type: String,
       enum: ["mumbai", "delhi", "bangalore"],
@@ -48,11 +55,11 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     passwordResetToken: {
-      type:String,
-   },
-   passwordResetExpires: {
-      type:Date,
-   },
+      type: String,
+    },
+    passwordResetExpires: {
+      type: Date,
+    },
     deliveryAddresses: [
       {
         label: String, // e.g., "Home", "Work"

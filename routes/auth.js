@@ -4,6 +4,7 @@ const User = require("../models/User");
 const { auth } = require("../middleware/auth");
 const sendEmail = require("../scripts/sendEmail");
 const bcrypt = require("bcryptjs");
+const { randomBytes } = require("crypto");
 
 const router = express.Router();
 
@@ -113,6 +114,7 @@ router.get("/me", auth, async (req, res) => {
         email: req.user.email,
         role: req.user.role,
         location: req.user.location,
+        isEmailVerified: req.user.isEmailVerified,
       },
     });
   } catch (error) {
@@ -208,7 +210,8 @@ router.post("/reset-password", async (req, res) => {
     });
   }
 });
-router.get("/profile", auth,  async (req, res) => {
+
+router.get("/profile", auth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
     if (!user) {
@@ -222,10 +225,73 @@ router.get("/profile", auth,  async (req, res) => {
     profile.address = user.address;
     profile.location = user.location;
     profile.gstin = user.gstin;
-    return res.json({profile: profile});
+    profile.isEmailVerified = user.isEmailVerified;
+    profile.joined = user.createdAt;
+    return res.json({ profile: profile });
   } catch (error) {
     console.error("Profile fetch error:", error);
-    return res.status(500).json({ message: "Server error while fetching profile" });
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching profile" });
+  }
+});
+
+function generateSecureString(length = 8) {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const bytes = randomBytes(length);
+  return Array.from(bytes, b => alphabet[b % alphabet.length]).join('');
+}
+
+router.get("/send-otp", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if( user.isEmailVerified) {
+      return res.status(400).json({ message: "Email already verified" });
+    }
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // Generate OTP
+    const otp = generateSecureString(6);
+    user.otp = otp;
+    await user.save();
+    await sendEmail(
+      user.email,
+      "Your OTP Code",
+      `<p>Your OTP code is: <strong>${otp}</strong></p>`
+    );
+
+    return res.status(200).json({ message: "OTP sent successfully" });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    return res.status(500).json({ message: "Server error while sending OTP" });
+  }
+});
+
+router.post("/verify-otp", auth, async (req, res) => {
+  const { otp } = req.body;
+  if (!otp) {
+    return res.status(400).json({ message: "OTP code is required" });
+  }
+  // Verify the authentication code
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const verifyCode = user.otp;
+    if (!verifyCode || verifyCode === "" || verifyCode === undefined) {
+      return res.status(400).json({ message: "Not Verified. TRY AGAIN." });
+    }
+    if (otp == verifyCode) {
+      user.isEmailVerified = true;
+      user.otp = undefined; // Clear OTP after successful verification
+      await user.save();
+      return res.status(200).json({ success: true, message: "OTP verified successfully" });
+    }
+    return res.status(400).json({ message: "Invalid or expired otp code" });
+  } catch (error) {
+    return res.status(400).json({ message: "Invalid or expired otp code" });
   }
 });
 
