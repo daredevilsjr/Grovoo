@@ -1,25 +1,28 @@
-import { Routes, Route } from "react-router-dom"
-import AuthProvider from "./components/AuthProvider"
-import Header from "./components/Header"
-import Footer from "./components/Footer"
-import HomePage from "./pages/HomePage"
-import LoginPage from "./pages/LoginPage"
-import RegisterPage from "./pages/RegisterPage"
-import ProductsPage from "./pages/ProductsPage"
-import CartPage from "./pages/CartPage"
-import CheckoutPage from "./pages/CheckoutPage"
-import OrdersPage from "./pages/OrdersPage"
-import OrderConfirmationPage from "./pages/OrderConfirmationPage"
-import AdminDashboard from "./pages/AdminDashboard"
-import ContactPage from "./pages/ContactPage"
-import ProtectedRoute from "./components/ProtectedRoute"
-import useScrollRestoration from "./hooks/useScrollRestoration"
-import Profile from "./pages/Profile"
-import ForgotPassword from "./pages/ForgotPassword"
-import ResetPassword from "./pages/ResetPassword"
+import { Routes, Route } from "react-router-dom";
+import AuthProvider from "./components/AuthProvider";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import ProductsPage from "./pages/ProductsPage";
+import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrdersPage from "./pages/OrdersPage";
+import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import AdminDashboard from "./pages/AdminDashboard";
+import ContactPage from "./pages/ContactPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import useScrollRestoration from "./hooks/useScrollRestoration";
+import Profile from "./pages/Profile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import DeliveryAgentProfile from "./pages/DAProfile";
+import DeliveryAgentRegistration from "./pages/DASignup";
+import ActiveOders from "./pages/ActiveOrders";
 
 function App() {
-  useScrollRestoration()
+  useScrollRestoration();
   return (
     <AuthProvider>
       <div className="App flex flex-col min-h-screen">
@@ -35,6 +38,9 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/forgot-password/" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/agent-profile" element={<DeliveryAgentProfile />} />
+            <Route path="/careers-signup" element={<DeliveryAgentRegistration />} />
+            <Route path="/active-orders" element={<ActiveOders />} />
             <Route
               path="/checkout"
               element={
@@ -72,7 +78,7 @@ function App() {
         <Footer />
       </div>
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;
