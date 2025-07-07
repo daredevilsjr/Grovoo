@@ -289,7 +289,8 @@ router.post("/verify-otp", auth, async (req, res) => {
   if (!otp) {
     return res.status(400).json({ message: "OTP code is required" });
   }
-  // Verify the authentication code
+  console.log("OTP received:", otp);
+  console.log("User ID:", req.user._id);
   try {
     const user = await User.findById(req.user._id);
     if (!user) {

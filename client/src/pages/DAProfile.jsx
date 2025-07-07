@@ -3,8 +3,18 @@
 import { useEffect, useState } from "react"
 import { User, Mail, Phone, MapPin, Car, Star, Package, CheckCircle, Edit, Save, X } from "lucide-react"
 import axios from "axios"
+import { toast } from "react-hot-toast"
 
 export default function DeliveryAgentProfile() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [otp, setOtp] = useState("")
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [verificationError, setVerificationError] = useState(null)
+  const [isVerified, setIsVerified] = useState(false)
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+  };
+
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState({
     name: "",
@@ -17,15 +27,51 @@ export default function DeliveryAgentProfile() {
     rating: 0,
     ordersAccepted: 0,
     ordersDelivered: 0,
-    isActive: true,
+    isActive: false,
   })
+
+  const sendOtp = async () => {
+    try {
+      const response = await axios.get("/api/auth/send-otp", { withCredentials: true });
+      console.log("response", response);
+      if (response.data.success) {
+        // setAuthenticationCode(response.data.authenticationCode);
+        setIsDialogOpen(true);
+        console.log("OTP sent successfully");
+      }
+    }
+    catch (err) {
+      setVerificationError("Some Error Occurred. Please try again later.");
+      console.log(err);
+    }
+  }
+
+  const verifyOtp = async () => {
+    setIsVerifying(true)
+    try {
+      const response = await axios.post("/api/auth/verify-otp", { otp }, { withCredentials: true });
+      if (response.data.success) {
+        setOtp("")
+        setIsVerified(true)
+        closeDialog();
+        toast.success("Email verified successfully!");
+      }
+    }
+    catch (error) {
+      console.error("Error verifying email:", error)
+      setVerificationError("Invalid OTP. Please try again.")
+    } finally { setIsVerifying(false); }
+  }
+
+
   useEffect(() => {
     const fetchProfileData = async () => {
       const response = await axios.get("/api/auth/profile", { withCredentials: true });
       if (response.data.success) {
         console.log(response.data);
         const profile = response.data.profile;
-        setProfileData({ ...profile.user, vehicleDetails: profile.vehicleDetails, ordersAccepted: profile.ordersAccepted, ordersDelivered: profile.ordersDelivered, rating: profile.rating, isActive: profile.isActive });
+        setProfileData({ ...profile.user, vehicleDetails: profile.vehicleDetails, ordersAccepted: profile.ordersAccepted, ordersDelivered: profile.ordersDelivered, rating: profile.rating });
+        setIsVerified(profile.user.isEmailVerified);
       }
     }
     fetchProfileData();
@@ -47,6 +93,21 @@ export default function DeliveryAgentProfile() {
       ...prev,
       [name]: value,
     }))
+  }
+  const Input = ({ value, onChange, disabled = false, type = "text", placeholder = "", className = "" }) => {
+    return (
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        placeholder={placeholder}
+        className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${disabled
+          ? "bg-gray-50 border-gray-200 text-gray-500"
+          : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+          } ${className}`}
+      />
+    )
   }
 
   const handleSave = () => {
@@ -199,10 +260,19 @@ export default function DeliveryAgentProfile() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email
                 </label>
+                <button
+                  onClick={() => {
+                    sendOtp();
+                    setIsDialogOpen((p) => !p);
+                  }}
+                  disabled={isVerified || isVerifying}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isVerified
+                    ? "bg-green-100 text-green-600 cursor-not-allowed" : "bg-blue-100 text-blue-600 hover:bg-blue-200"}`}
+                >{isVerified ? "Verified" : "Not Verified"}</button>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <input
@@ -217,7 +287,88 @@ export default function DeliveryAgentProfile() {
                       }`}
                   />
                 </div>
+              </div> */}
+              <div className="space-y-3 group">
+                {/* Flex container for label and button */}
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-gray-700 flex items-center">
+                    <Mail className="w-4 h-4 mr-2 text-purple-600" />
+                    Email Address
+                  </label>
+                  <button
+                    onClick={() => {
+                      sendOtp();
+                      setIsDialogOpen((p) => !p);
+                    }}
+                    disabled={isVerified || isVerifying}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isVerified
+                      ? "bg-green-100 text-green-600 cursor-not-allowed"
+                      : "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                      }`}
+                  >
+                    {isVerified ? "Verified" : "Not Verified"}
+                  </button>
+                </div>
+                {/* Input below */}
+                <Input
+                  type="email"
+                  value={profileData?.email}
+                  disabled={!isEditing}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                />
               </div>
+              {isDialogOpen && (
+                <div
+                  className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"
+                  onClick={closeDialog}
+                >
+                  <div
+                    className="bg-white text-gray-800 rounded-xl shadow-xl p-6 w-full max-w-sm relative"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={closeDialog}
+                      className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl"
+                    >
+                      ✖
+                    </button>
+
+                    <h2 className="text-lg font-semibold mb-4 text-center">Verify Your Email</h2>
+
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        verifyOtp(); // your OTP verification logic
+                      }}
+                      className="space-y-4"
+                    >
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Enter OTP sent to {profileData?.email}
+                        </label>
+                        <input
+                          type="text"
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value)}
+                          disabled={isVerifying}
+                          required
+                          placeholder="Enter OTP Code"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                        />
+                      </div>
+                      {verificationError && <div>{JSON.stringify(verificationError)}</div>}
+                      <button
+                        type="submit"
+                        disabled={isVerifying}
+                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                      >
+                        {isVerifying ? "Verifying..." : "Verify Email"}
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+
             </div>
 
             <div className="space-y-2">
