@@ -1,6 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const DeliveryAgent = require("../models/deliveryAgent");
 const { auth } = require("../middleware/auth");
 const sendEmail = require("../scripts/sendEmail");
 const bcrypt = require("bcryptjs");
@@ -71,6 +72,7 @@ router.post("/login", async (req, res) => {
     } else if (phone) {
       user = await User.findOne({ phone });
     }
+    // console.log("User found:", user);
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -217,6 +219,19 @@ router.get("/profile", auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    if (user.role === "delivery") {
+      const deliveryAgent = await DeliveryAgent.findOne({ user: user._id });
+      if (!deliveryAgent) {
+        return res.status(404).json({ message: "Delivery agent not found" });
+      }
+      await deliveryAgent.populate("user");
+      if (deliveryAgent) {
+        return res.status(200).json({
+          profile: deliveryAgent ,
+          success: true,
+        });
+      }
+    }
     let profile = {};
     profile.name = user.name;
     profile.email = user.email;
@@ -237,15 +252,16 @@ router.get("/profile", auth, async (req, res) => {
 });
 
 function generateSecureString(length = 8) {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const alphabet =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const bytes = randomBytes(length);
-  return Array.from(bytes, b => alphabet[b % alphabet.length]).join('');
+  return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
 }
 
 router.get("/send-otp", auth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-    if( user.isEmailVerified) {
+    if (user.isEmailVerified) {
       return res.status(400).json({ message: "Email already verified" });
     }
     if (!user) {
@@ -287,11 +303,69 @@ router.post("/verify-otp", auth, async (req, res) => {
       user.isEmailVerified = true;
       user.otp = undefined; // Clear OTP after successful verification
       await user.save();
-      return res.status(200).json({ success: true, message: "OTP verified successfully" });
+      return res
+        .status(200)
+        .json({ success: true, message: "OTP verified successfully" });
     }
     return res.status(400).json({ message: "Invalid or expired otp code" });
   } catch (error) {
     return res.status(400).json({ message: "Invalid or expired otp code" });
+  }
+});
+
+router.post("/agent/register", async (req, res) => {
+  const { name, email, password, phone, address, location, vehicleDetails } =
+    req.body;
+  if (
+    !name ||
+    !email ||
+    !password ||
+    !phone ||
+    !address ||
+    !location ||
+    !vehicleDetails
+  ) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+  try {
+    const user = await User.create({
+      name,
+      email,
+      password,
+      phone,
+      address,
+      location,
+      role: "delivery",
+    });
+    const deliveryAgent = await DeliveryAgent.create({
+      user: user._id,
+      vehicleDetails,
+    });
+    await deliveryAgent.populate("user");
+    await deliveryAgent.save();
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET || "fallback_secret",
+      { expiresIn: "7d" }
+    );
+
+    // console.log("Delivery agent created:", deliveryAgent);
+    return res.status(201).json({
+      message: "Delivery agent Account created successfully",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        location: user.location,
+      },
+    });
+  } catch (error) {
+    console.error("Error creating delivery agent:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error while creating delivery agent" });
   }
 });
 

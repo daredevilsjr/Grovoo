@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-const { default: orders } = require("razorpay/dist/types/orders");
+// const { default: orders } = require("razorpay/dist/types/orders");
 
 const deliveryAgentSchema = new mongoose.Schema({
   user: {
@@ -34,21 +34,16 @@ const deliveryAgentSchema = new mongoose.Schema({
       },
     },
   ],
-  pincode: {
-    type: String,
-    minlength: 6,
-    maxlength: 6,
-    required: true,
-  },
   vehicleDetails: {
     type: String,
     required: true,
   },
-  rating: {
-    type: Number,
-    default: 0,
-    min: 0,
-    max: 5,
+  reviews: {
+    rating: { type: Number, default: 0, min: 0, max: 5 },
+    comment: { type: String, trim: true },
+    reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    reviewedAt: { type: Date, default: Date.now },
   },
 });
 const DeliveryAgent = mongoose.model("DeliveryAgent", deliveryAgentSchema);
+module.exports = DeliveryAgent;

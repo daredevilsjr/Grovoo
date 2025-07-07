@@ -1,269 +1,14 @@
-// "use client"
-
-// import { useState } from "react"
-// import { Button } from "@/components/ui/button"
-// import { Input } from "@/components/ui/input"
-// import { Label } from "@/components/ui/label"
-// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-// import { Textarea } from "@/components/ui/textarea"
-// import { User, Mail, Phone, MapPin, Car, Lock } from "lucide-react"
-
-// export default function DeliveryAgentSignup({ onSignupSuccess }) {
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     email: "",
-//     password: "",
-//     confirmPassword: "",
-//     phone: "",
-//     address: "",
-//     location: "",
-//     pincode: "",
-//     vehicleDetails: "",
-//   })
-//   const [isLoading, setIsLoading] = useState(false)
-//   const [errors, setErrors] = useState({})
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target
-//     setFormData((prev) => ({
-//       ...prev,
-//       [name]: value,
-//     }))
-//     // Clear error when user starts typing
-//     if (errors[name]) {
-//       setErrors((prev) => ({
-//         ...prev,
-//         [name]: "",
-//       }))
-//     }
-//   }
-
-//   const handleSelectChange = (name, value) => {
-//     setFormData((prev) => ({
-//       ...prev,
-//       [name]: value,
-//     }))
-//     if (errors[name]) {
-//       setErrors((prev) => ({
-//         ...prev,
-//         [name]: "",
-//       }))
-//     }
-//   }
-
-//   const validateForm = () => {
-//     const newErrors = {}
-
-//     if (!formData.name.trim()) newErrors.name = "Name is required"
-//     if (!formData.email.trim()) newErrors.email = "Email is required"
-//     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid"
-//     if (!formData.password) newErrors.password = "Password is required"
-//     else if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters"
-//     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match"
-//     if (!formData.phone.trim()) newErrors.phone = "Phone number is required"
-//     else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ""))) newErrors.phone = "Phone number must be 10 digits"
-//     if (!formData.address.trim()) newErrors.address = "Address is required"
-//     if (!formData.location) newErrors.location = "Location is required"
-//     if (!formData.pincode.trim()) newErrors.pincode = "Current location is required"
-//     if (!formData.vehicleDetails.trim()) newErrors.vehicleDetails = "Vehicle details are required"
-
-//     setErrors(newErrors)
-//     return Object.keys(newErrors).length === 0
-//   }
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault()
-
-//     if (!validateForm()) return
-
-//     setIsLoading(true)
-
-//     // Simulate API call
-//     setTimeout(() => {
-//       console.log("Delivery agent signup data:", formData)
-//       setIsLoading(false)
-//       onSignupSuccess()
-//     }, 2000)
-//   }
-
-//   return (
-//     <div className="min-h-screen flex items-center justify-center p-4">
-//       <Card className="w-full max-w-2xl">
-//         <CardHeader className="text-center">
-//           <CardTitle className="text-2xl font-bold">Delivery Agent Signup</CardTitle>
-//           <CardDescription>Join our delivery network and start earning today</CardDescription>
-//         </CardHeader>
-//         <CardContent>
-//           <form onSubmit={handleSubmit} className="space-y-6">
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//               <div className="space-y-2">
-//                 <Label htmlFor="name">Full Name</Label>
-//                 <div className="relative">
-//                   <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                   <Input
-//                     id="name"
-//                     name="name"
-//                     type="text"
-//                     placeholder="Enter your full name"
-//                     value={formData.name}
-//                     onChange={handleInputChange}
-//                     className={`pl-10 ${errors.name ? "border-red-500" : ""}`}
-//                   />
-//                 </div>
-//                 {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
-//               </div>
-
-//               <div className="space-y-2">
-//                 <Label htmlFor="email">Email</Label>
-//                 <div className="relative">
-//                   <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                   <Input
-//                     id="email"
-//                     name="email"
-//                     type="email"
-//                     placeholder="Enter your email"
-//                     value={formData.email}
-//                     onChange={handleInputChange}
-//                     className={`pl-10 ${errors.email ? "border-red-500" : ""}`}
-//                   />
-//                 </div>
-//                 {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
-//               </div>
-//             </div>
-
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//               <div className="space-y-2">
-//                 <Label htmlFor="password">Password</Label>
-//                 <div className="relative">
-//                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                   <Input
-//                     id="password"
-//                     name="password"
-//                     type="password"
-//                     placeholder="Enter password"
-//                     value={formData.password}
-//                     onChange={handleInputChange}
-//                     className={`pl-10 ${errors.password ? "border-red-500" : ""}`}
-//                   />
-//                 </div>
-//                 {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
-//               </div>
-
-//               <div className="space-y-2">
-//                 <Label htmlFor="confirmPassword">Confirm Password</Label>
-//                 <div className="relative">
-//                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                   <Input
-//                     id="confirmPassword"
-//                     name="confirmPassword"
-//                     type="password"
-//                     placeholder="Confirm password"
-//                     value={formData.confirmPassword}
-//                     onChange={handleInputChange}
-//                     className={`pl-10 ${errors.confirmPassword ? "border-red-500" : ""}`}
-//                   />
-//                 </div>
-//                 {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword}</p>}
-//               </div>
-//             </div>
-
-//             <div className="space-y-2">
-//               <Label htmlFor="phone">Phone Number</Label>
-//               <div className="relative">
-//                 <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                 <Input
-//                   id="phone"
-//                   name="phone"
-//                   type="tel"
-//                   placeholder="Enter your phone number"
-//                   value={formData.phone}
-//                   onChange={handleInputChange}
-//                   className={`pl-10 ${errors.phone ? "border-red-500" : ""}`}
-//                 />
-//               </div>
-//               {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
-//             </div>
-
-//             <div className="space-y-2">
-//               <Label htmlFor="address">Address</Label>
-//               <div className="relative">
-//                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                 <Textarea
-//                   id="address"
-//                   name="address"
-//                   placeholder="Enter your full address"
-//                   value={formData.address}
-//                   onChange={handleInputChange}
-//                   className={`pl-10 min-h-[80px] ${errors.address ? "border-red-500" : ""}`}
-//                 />
-//               </div>
-//               {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
-//             </div>
-
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//               <div className="space-y-2">
-//                 <Label htmlFor="location">Service Location</Label>
-//                 <Select onValueChange={(value) => handleSelectChange("location", value)}>
-//                   <SelectTrigger className={errors.location ? "border-red-500" : ""}>
-//                     <SelectValue placeholder="Select your service location" />
-//                   </SelectTrigger>
-//                   <SelectContent>
-//                     <SelectItem value="mumbai">Mumbai</SelectItem>
-//                     <SelectItem value="delhi">Delhi</SelectItem>
-//                     <SelectItem value="bangalore">Bangalore</SelectItem>
-//                   </SelectContent>
-//                 </Select>
-//                 {errors.location && <p className="text-sm text-red-500">{errors.location}</p>}
-//               </div>
-
-//               <div className="space-y-2">
-//                 <Label htmlFor="pincode">Current Location</Label>
-//                 <Input
-//                   id="pincode"
-//                   name="pincode"
-//                   type="text"
-//                   placeholder="Enter your current location"
-//                   value={formData.pincode}
-//                   onChange={handleInputChange}
-//                   className={errors.pincode ? "border-red-500" : ""}
-//                 />
-//                 {errors.pincode && <p className="text-sm text-red-500">{errors.pincode}</p>}
-//               </div>
-//             </div>
-
-//             <div className="space-y-2">
-//               <Label htmlFor="vehicleDetails">Vehicle Details</Label>
-//               <div className="relative">
-//                 <Car className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-//                 <Input
-//                   id="vehicleDetails"
-//                   name="vehicleDetails"
-//                   type="text"
-//                   placeholder="e.g., Honda Activa, MH12AB1234"
-//                   value={formData.vehicleDetails}
-//                   onChange={handleInputChange}
-//                   className={`pl-10 ${errors.vehicleDetails ? "border-red-500" : ""}`}
-//                 />
-//               </div>
-//               {errors.vehicleDetails && <p className="text-sm text-red-500">{errors.vehicleDetails}</p>}
-//             </div>
-
-//             <Button type="submit" className="w-full" disabled={isLoading}>
-//               {isLoading ? "Creating Account..." : "Sign Up as Delivery Agent"}
-//             </Button>
-//           </form>
-//         </CardContent>
-//       </Card>
-//     </div>
-//   )
-// }
 "use client"
 
 import { useState } from "react"
 import { User, Mail, Phone, MapPin, Car, Lock } from "lucide-react"
+import axios from 'axios'
+import { useAuthStore } from "../store/useStore";
+import { useNavigate } from "react-router-dom"
 
-export default function DeliveryAgentSignup({ onSignupSuccess }) {
+export default function DeliveryAgentSignup() {
+  const navigate = useNavigate();
+  const { agentRegister } = useAuthStore();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -272,7 +17,6 @@ export default function DeliveryAgentSignup({ onSignupSuccess }) {
     phone: "",
     address: "",
     location: "",
-    pincode: "",
     vehicleDetails: "",
   })
   const [isLoading, setIsLoading] = useState(false)
@@ -319,7 +63,6 @@ export default function DeliveryAgentSignup({ onSignupSuccess }) {
     else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ""))) newErrors.phone = "Phone number must be 10 digits"
     if (!formData.address.trim()) newErrors.address = "Address is required"
     if (!formData.location) newErrors.location = "Location is required"
-    if (!formData.pincode.trim()) newErrors.pincode = "Current location is required"
     if (!formData.vehicleDetails.trim()) newErrors.vehicleDetails = "Vehicle details are required"
 
     setErrors(newErrors)
@@ -328,16 +71,22 @@ export default function DeliveryAgentSignup({ onSignupSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    console.log('agentRegister:', agentRegister);
 
     if (!validateForm()) return
 
     setIsLoading(true)
 
-    // Simulate API call
+    const response = await agentRegister(formData);
+    if(response.success) {
+      console.log("Delivery agent signup successful:", response.message)
+    }else{
+      setErrors({ form: response.message || "Signup failed, please try again." })
+    }
     setTimeout(() => {
       console.log("Delivery agent signup data:", formData)
       setIsLoading(false)
-      onSignupSuccess()
+      navigate("/login");
     }, 2000)
   }
 

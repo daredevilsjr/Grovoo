@@ -8,18 +8,18 @@ import RegisterPage from "./pages/RegisterPage";
 import ProductsPage from "./pages/ProductsPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
-import OrdersPage from "./pages/OrdersPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import ContactPage from "./pages/ContactPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import useScrollRestoration from "./hooks/useScrollRestoration";
-import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import DeliveryAgentProfile from "./pages/DAProfile";
+// import Profile from "./pages/Profile";
+// import DeliveryAgentProfile from "./pages/DAProfile";
 import DeliveryAgentRegistration from "./pages/DASignup";
-import ActiveOders from "./pages/ActiveOrders";
+// import OrdersPage from "./pages/OrdersPage";
+// import ActiveOders from "./pages/ActiveOrders";
 
 function App() {
   useScrollRestoration();
@@ -31,16 +31,19 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/profile" element={<Profile />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/forgot-password/" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
-            <Route path="/agent-profile" element={<DeliveryAgentProfile />} />
             <Route path="/careers-signup" element={<DeliveryAgentRegistration />} />
-            <Route path="/active-orders" element={<ActiveOders />} />
+            {/* <Route path="/active-orders" element={<ActiveOders />} /> */}
+
+            <Route
+              path="/profile"
+              element={<ProtectedRoute rolebased page="profile"></ProtectedRoute>}
+            />
             <Route
               path="/checkout"
               element={
@@ -52,8 +55,8 @@ function App() {
             <Route
               path="/orders"
               element={
-                <ProtectedRoute>
-                  <OrdersPage />
+                <ProtectedRoute rolebased page="orders">
+                  {/* <OrdersPage /> */}
                 </ProtectedRoute>
               }
             />

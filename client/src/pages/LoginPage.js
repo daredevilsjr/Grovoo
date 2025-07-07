@@ -41,15 +41,19 @@ const LoginPage = () => {
     setLoading(true);
 
     const result = await login(formData.email, formData.password, formData.phone);
-
+    console.log("Login result:", result);
     if (result.success) {
+      console.log("Login successful:", result);
       toast.success("Login successful!");
+      if(result.redirectPath) {
+        console.log("Redirecting to:", result.redirectPath);
+        navigate(result.redirectPath, { replace: true });
+      }
       const from = location.state?.from?.pathname || "/";
       navigate(from, { replace: true });
     } else {
       toast.error(result.message);
     }
-
     setLoading(false);
   };
 
