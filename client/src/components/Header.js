@@ -66,9 +66,8 @@ const Header = () => {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white/95 backdrop-blur-md shadow-xl border-b border-gray-100" : "bg-white shadow-lg"
-      }`}
+      className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? "bg-white/95 backdrop-blur-md shadow-xl border-b border-gray-100" : "bg-white shadow-lg"
+        }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
@@ -109,19 +108,19 @@ const Header = () => {
               Home
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
             </Link>
-            <Link
+            {user?.role !== "delivery" && (<Link
               to="/products"
               className="text-gray-700 hover:text-blue-600 font-semibold transition-all duration-300 hover:scale-105 relative group"
             >
               Products
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
-            </Link>
+            </Link>)}
             {isAuthenticated && (
               <Link
                 to="/orders"
                 className="text-gray-700 hover:text-blue-600 font-semibold transition-all duration-300 hover:scale-105 relative group"
               >
-                My Orders
+                {user?.role === "delivery" ? "Active Orders" : "My Orders"}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
             )}
@@ -139,7 +138,7 @@ const Header = () => {
             {isAuthenticated && user ? (
               <>
                 {/* Cart */}
-                <Link
+                {user?.role !== "delivery" && (<Link
                   to="/cart"
                   className="relative p-3 text-gray-700 hover:text-blue-600 transition-all duration-300 hover:scale-110 group"
                 >
@@ -151,7 +150,7 @@ const Header = () => {
                       </span>
                     )}
                   </div>
-                </Link>
+                </Link>)}
 
                 {/* User Menu */}
                 <div className="relative">
@@ -182,9 +181,8 @@ const Header = () => {
                             <p className="font-semibold text-gray-800">{user.name}</p>
                             <p className="text-sm text-gray-600">{user.email}</p>
                             <span
-                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mt-1 ${
-                                user.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"
-                              }`}
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mt-1 ${user.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-blue-100 text-blue-800"
+                                }`}
                             >
                               {user.role === "admin" ? "Admin Account" : "Hotel Account"}
                             </span>
@@ -209,7 +207,7 @@ const Header = () => {
                           onClick={() => setShowUserMenu(false)}
                         >
                           <i className="fas fa-list mr-3"></i>
-                          My Orders
+                          {user?.role === "delivery" ? "Active Orders" : "My Orders"}
                         </Link>
                         <Link
                           to="/profile"
