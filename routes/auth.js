@@ -6,6 +6,7 @@ const { auth } = require("../middleware/auth");
 const sendEmail = require("../scripts/sendEmail");
 const bcrypt = require("bcryptjs");
 const { randomBytes } = require("crypto");
+const { isValidObjectId } = require("mongoose");
 
 const router = express.Router();
 
@@ -227,7 +228,7 @@ router.get("/profile", auth, async (req, res) => {
       await deliveryAgent.populate("user");
       if (deliveryAgent) {
         return res.status(200).json({
-          profile: deliveryAgent ,
+          profile: deliveryAgent,
           success: true,
         });
       }
@@ -338,9 +339,10 @@ router.post("/agent/register", async (req, res) => {
       location,
       role: "delivery",
     });
+    const vehicleDetail = { registrationNumber: vehicleDetails, isVehicleVerified: false }
     const deliveryAgent = await DeliveryAgent.create({
       user: user._id,
-      vehicleDetails,
+      vehicleDetails: vehicleDetail,
     });
     await deliveryAgent.populate("user");
     await deliveryAgent.save();
@@ -367,6 +369,30 @@ router.post("/agent/register", async (req, res) => {
     return res
       .status(500)
       .json({ message: "Server error while creating delivery agent" });
+  }
+});
+
+router.put("/profile", auth, async (req, res) => {
+  const userId = req.user._id;
+  if (!userId) {
+    return res.status(400).json({ message: "Login to Continue" });
+  }
+  try {
+    const { name, phone, address, isActive, location } = req.body;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.name = name || user.name;
+    user.phone = phone || user.phone;
+    user.address = address || user.address;
+    user.isActive = isActive || user.isActive;
+    user.location = location || user.location;
+    await user.save();
+    return res.status(200).json({ message: "Profile updated successfully", profile: user });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server Error" });
   }
 });
 

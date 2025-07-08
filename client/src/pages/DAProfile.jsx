@@ -23,11 +23,12 @@ export default function DeliveryAgentProfile() {
     address: "",
     location: "",
     pincode: "841405",
-    vehicleDetails: "",
+    vehicleDetails: {},
     rating: 0,
     ordersAccepted: 0,
     ordersDelivered: 0,
     isActive: false,
+    agentVerified: false,
   })
 
   const sendOtp = async () => {
@@ -70,12 +71,13 @@ export default function DeliveryAgentProfile() {
       if (response.data.success) {
         console.log(response.data);
         const profile = response.data.profile;
-        setProfileData({ ...profile.user, vehicleDetails: profile.vehicleDetails, ordersAccepted: profile.ordersAccepted, ordersDelivered: profile.ordersDelivered, rating: profile.rating });
+        setProfileData({ ...profile.user, agentVerified: profile.agentVerified, vehicleDetails: profile.vehicleDetails, ordersAccepted: profile.ordersAccepted, ordersDelivered: profile.ordersDelivered, rating: profile.rating });
         setIsVerified(profile.user.isEmailVerified);
       }
     }
     fetchProfileData();
   }, [])
+
   const [editData, setEditData] = useState({ ...profileData })
 
   useEffect(() => { setEditData({ ...profileData }) }, [profileData]);
@@ -94,27 +96,22 @@ export default function DeliveryAgentProfile() {
       [name]: value,
     }))
   }
-  const Input = ({ value, onChange, disabled = false, type = "text", placeholder = "", className = "" }) => {
-    return (
-      <input
-        type={type}
-        value={value}
-        onChange={onChange}
-        disabled={disabled}
-        placeholder={placeholder}
-        className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${disabled
-          ? "bg-gray-50 border-gray-200 text-gray-500"
-          : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-          } ${className}`}
-      />
-    )
-  }
 
   const handleSave = () => {
+    setIsEditing(true);
     setProfileData({ ...editData })
+    const updateProfile = async () => {
+      const response = await axios.put("/api/auth/profile", editData, { withCredentials: true });
+      if (response.data.success) {
+        toast.success("Profile updated successfully!");
+      }
+      else toast.error("Something went wrong!");
+      setProfileData({...response.data.profile});
+      setIsEditing(false)
+    }
+    updateProfile();
     setIsEditing(false)
   }
-
   const handleCancel = () => {
     setEditData({ ...profileData })
     setIsEditing(false)
@@ -135,7 +132,13 @@ export default function DeliveryAgentProfile() {
           <h1 className="text-3xl font-bold text-gray-900">Delivery Agent Profile</h1>
           <div className="flex items-center space-x-4">
             <span
-              className={`px-3 py-1 rounded-full text-sm font-medium ${profileData.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+              className={`px-3 py-1 rounded-full text-sm font-medium ${profileData?.agentVerified ? "bg-green-100 text-green-800" : "bg-red-100 text-gray-800"
+                }`}
+            >
+              {profileData.agentVerified ? "Agent Verified" : "Verifiaction Pending"}
+            </span>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${profileData?.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
                 }`}
             >
               {profileData.isActive ? "Active" : "Inactive"}
@@ -241,7 +244,7 @@ export default function DeliveryAgentProfile() {
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="name" className="py-2.5 block text-sm font-medium text-gray-700">
                   Full Name
                 </label>
                 <div className="relative">
@@ -260,34 +263,6 @@ export default function DeliveryAgentProfile() {
                 </div>
               </div>
 
-              {/* <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <button
-                  onClick={() => {
-                    sendOtp();
-                    setIsDialogOpen((p) => !p);
-                  }}
-                  disabled={isVerified || isVerifying}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isVerified
-                    ? "bg-green-100 text-green-600 cursor-not-allowed" : "bg-blue-100 text-blue-600 hover:bg-blue-200"}`}
-                >{isVerified ? "Verified" : "Not Verified"}</button>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <input
-                    id="email"
-                    name="email"
-                    value={isEditing ? editData.email : profileData.email}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-md ${isEditing
-                      ? "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      : "border-gray-200 bg-gray-50"
-                      }`}
-                  />
-                </div>
-              </div> */}
               <div className="space-y-3 group">
                 {/* Flex container for label and button */}
                 <div className="flex items-center justify-between">
@@ -310,11 +285,17 @@ export default function DeliveryAgentProfile() {
                   </button>
                 </div>
                 {/* Input below */}
-                <Input
-                  type="email"
-                  value={profileData?.email}
-                  disabled={!isEditing}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
+                <input
+                  id="email"
+                  name="email"
+                  value={profileData.email}
+                  // onChange={handleInputChange}
+                  disabled
+                  className={`w-full pl-10 pr-3 py-2 border rounded-md "border-gray-200 bg-gray-50"`}
+                // className={`w-full pl-10 pr-3 py-2 border rounded-md ${isEditing
+                //   ? "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                //   : "border-gray-200 bg-gray-50"
+                //   }`}
                 />
               </div>
               {isDialogOpen && (
@@ -455,24 +436,39 @@ export default function DeliveryAgentProfile() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="vehicleDetails" className="block text-sm font-medium text-gray-700">
-                Vehicle Details
-              </label>
+              <div className="flex items-center ">
+                <label htmlFor="vehicleDetails" className="block text-sm font-medium text-gray-700 pr-4">
+                  Vehicle Details
+                </label>
+                <span
+                  className={`px-3 rounded-full text-sm font-medium ${profileData?.vehicleDetails?.isVehicleVerified
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-gray-800"
+                    }`}
+                >
+                  {profileData.vehicleDetails?.isVehicleVerified ? "Verified" : "Verification Pending"}
+                </span>
+              </div>
               <div className="relative">
                 <Car className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <input
-                  id="vehicleDetails"
-                  name="vehicleDetails"
-                  value={isEditing ? editData.vehicleDetails : profileData.vehicleDetails}
+                  id="registrationNumber"
+                  name="registrationNumber"
+                  value={
+                    isEditing
+                      ? editData.vehicleDetails?.registrationNumber
+                      : profileData.vehicleDetails?.registrationNumber
+                  }
                   onChange={handleInputChange}
                   disabled={!isEditing}
                   className={`w-full pl-10 pr-3 py-2 border rounded-md ${isEditing
-                    ? "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    : "border-gray-200 bg-gray-50"
+                      ? "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      : "border-gray-200 bg-gray-50"
                     }`}
                 />
               </div>
             </div>
+
           </div>
         </div>
       </div>

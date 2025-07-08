@@ -8,6 +8,11 @@ const deliveryAgentSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  agentVerified : {
+    type: Boolean,
+    default: false,
+  }
+  ,
   ordersAccepted: [
     {
       orders: {
@@ -35,8 +40,14 @@ const deliveryAgentSchema = new mongoose.Schema({
     },
   ],
   vehicleDetails: {
-    type: String,
-    required: true,
+    registrationNumber: {
+      type: String,
+      required: true,
+    },
+    isVehicleVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   reviews: {
     rating: { type: Number, default: 0, min: 0, max: 5 },
