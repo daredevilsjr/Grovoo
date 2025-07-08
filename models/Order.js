@@ -29,9 +29,10 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    }, confirmationOtp: {
+    },
+    confirmationOtp: {
       type: String,
-      required: true,
+      // required: true,
     },
     deliveryAgent: {
       type: mongoose.Schema.Types.ObjectId,
@@ -60,7 +61,7 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "processing", "shipped", "on way", "delivered", "cancelled"],
+      enum: ["pending", "confirmed", "delivered", "cancelled"],
       default: "pending",
     },
     paymentStatus: {

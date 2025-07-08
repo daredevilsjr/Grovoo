@@ -29,10 +29,6 @@ const OrdersPage = () => {
         return "bg-yellow-100 text-yellow-800"
       case "confirmed":
         return "bg-blue-100 text-blue-800"
-      case "processing":
-        return "bg-purple-100 text-purple-800"
-      case "shipped":
-        return "bg-indigo-100 text-indigo-800"
       case "delivered":
         return "bg-green-100 text-green-800"
       case "cancelled":
@@ -110,6 +106,15 @@ const OrdersPage = () => {
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
                     {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                   </span>
+                  {order.status === "confirmed" && (
+                    order?.confirmationOtp && (<p className="font-semibold">Confirmation Otp: {order?.confirmationOtp}</p>)
+                  )}
+                  {order.deliveryAgent && (
+                    <>
+                      <p className="font-semibold">₹{order?.deliveryAgent?.name}</p>
+                      <p className="font-semibold">₹{order?.deliveryAgent?.email}</p>
+                    </>
+                  )}
                   {order.estimatedDelivery && (
                     <p className="text-sm text-gray-600 mt-2">
                       Est. Delivery: {new Date(order.estimatedDelivery).toLocaleDateString()}

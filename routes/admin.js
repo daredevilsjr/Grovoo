@@ -5,6 +5,7 @@ const User = require("../models/User")
 const { adminAuth } = require("../middleware/auth")
 const DeliveryAgent = require("../models/deliveryAgent")
 const sendEmail = require("../scripts/sendEmail");
+const { randomBytes } = require("crypto");
 
 const router = express.Router()
 
@@ -91,19 +92,43 @@ router.get("/orders", adminAuth, async (req, res) => {
     res.status(500).json({ message: "Server error" })
   }
 })
-
+function generateSecureString(length = 8) {
+  const alphabet =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const bytes = randomBytes(length);
+  return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
+}
 // Update order status
-router.patch("/orders/:id/status", adminAuth, async (req, res) => {
+router.patch("/orders/:id/confirm", adminAuth, async (req, res) => {
   try {
-    const { status } = req.body
-
-    const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true }).populate("user", "name email")
-
+    const order = await Order.findById(req.params.id).populate("user", "name email");
     if (!order) {
       return res.status(404).json({ message: "Order not found" })
     }
-
-    res.json(order)
+    const otp = generateSecureString(6);
+    order.confirmationOtp = otp;
+    order.status = "confirmed";
+    await order.save();
+    return res.status(200).json({ success: true, order: order });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" })
+  }
+});
+async function initiateRefund(id) {
+  console.log(`Refund initiated for order id: ${id}`);
+}
+router.patch("/orders/:id/cancel", adminAuth, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).populate("user", "name email");
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" })
+    }
+    if (order.paymentStatus == "completed") {
+      initiateRefund(order._id);
+    }
+    order.status = "cancelled";
+    await order.save();
+    return res.status(200).json({ success: true, order: order });
   } catch (error) {
     res.status(500).json({ message: "Server error" })
   }
@@ -122,8 +147,8 @@ router.get("/users", adminAuth, async (req, res) => {
 
 router.get("/agents", adminAuth, async (req, res) => {
   try {
-    const agents = await DeliveryAgent.find({agentVerified: false}).populate("user").sort({ createdAt: -1 });
-    return res.status(200).json({success: true ,agents: agents});
+    const agents = await DeliveryAgent.find().populate("user").sort({ createdAt: -1 });
+    return res.status(200).json({ success: true, agents: agents });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Server error" })
@@ -141,11 +166,11 @@ router.patch("/agents/:id/verify", adminAuth, async (req, res) => {
     const emailId = agent.user.email;
     await agent.save();
     await sendEmail(emailId, "Agent Verified", "Congratulations .Your Delivery Agent application has been Verified");
-    return res.status(200).json({success: true,message: "Agent verified successfully"});
+    return res.status(200).json({ success: true, message: "Agent verified successfully" });
   }
-  catch(err){
+  catch (err) {
     console.log(err);
-    return res.status(500).json({message: "Server error"});
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -160,11 +185,11 @@ router.patch("/agents/:id/reject", adminAuth, async (req, res) => {
     await sendEmail(emailId, "Agent Rejected", "Your agent application has been rejected. Try again later with Valid Details.");
     await DeliveryAgent.findByIdAndDelete(req.params.id);
     await User.findByIdAndDelete(user._id);
-    return res.status(200).json({success: true,message: "Agent rejected successfully"});
+    return res.status(200).json({ success: true, message: "Agent rejected successfully" });
   }
-  catch(err){
+  catch (err) {
     console.log(err);
-    return res.status(500).json({message: "Server error"});
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
