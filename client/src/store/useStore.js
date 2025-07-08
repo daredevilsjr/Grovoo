@@ -44,7 +44,7 @@ export const useAuthStore = create(
             isAuthenticated: true,
             loading: false,
           });
-          if(user.role === "deliveryAgent") {
+          if (user.role === "deliveryAgent") {
             toast.success("Login successful! Please complete your profile.");
             return { success: true, redirectPath: "/agent-profile" };
           }
@@ -85,8 +85,14 @@ export const useAuthStore = create(
         try {
           const response = await axios.post(
             "/api/auth/agent/register",
-            userData
+            userData, // This should be FormData
+            {
+              headers: {
+                "Content-Type": "multipart/form-data"
+              }
+            }
           );
+          
           const { token, user } = response.data;
 
           localStorage.setItem("token", token);

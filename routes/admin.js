@@ -3,6 +3,8 @@ const Order = require("../models/Order")
 const Product = require("../models/Product")
 const User = require("../models/User")
 const { adminAuth } = require("../middleware/auth")
+const DeliveryAgent = require("../models/deliveryAgent")
+const sendEmail = require("../scripts/sendEmail");
 
 const router = express.Router()
 
@@ -117,5 +119,53 @@ router.get("/users", adminAuth, async (req, res) => {
     res.status(500).json({ message: "Server error" })
   }
 })
+
+router.get("/agents", adminAuth, async (req, res) => {
+  try {
+    const agents = await DeliveryAgent.find({agentVerified: false}).populate("user").sort({ createdAt: -1 });
+    return res.status(200).json({success: true ,agents: agents});
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error" })
+  }
+})
+
+router.patch("/agents/:id/verify", adminAuth, async (req, res) => {
+  try {
+    const agent = await DeliveryAgent.findById(req.params.id).populate("user");
+    if (!agent) {
+      return res.status(404).json({ message: "Agent not found" });
+    }
+    agent.agentVerified = true;
+    agent.vehicleDetails.isVehicleVerified = true;
+    const emailId = agent.user.email;
+    await agent.save();
+    await sendEmail(emailId, "Agent Verified", "Congratulations .Your Delivery Agent application has been Verified");
+    return res.status(200).json({success: true,message: "Agent verified successfully"});
+  }
+  catch(err){
+    console.log(err);
+    return res.status(500).json({message: "Server error"});
+  }
+});
+
+router.patch("/agents/:id/reject", adminAuth, async (req, res) => {
+  try {
+    const agent = await DeliveryAgent.findById(req.params.id).populate("user");
+    if (!agent) {
+      return res.status(404).json({ message: "Agent not found" });
+    }
+    const user = agent.user;
+    const emailId = user.email;
+    await sendEmail(emailId, "Agent Rejected", "Your agent application has been rejected. Try again later with Valid Details.");
+    await DeliveryAgent.findByIdAndDelete(req.params.id);
+    await User.findByIdAndDelete(user._id);
+    return res.status(200).json({success: true,message: "Agent rejected successfully"});
+  }
+  catch(err){
+    console.log(err);
+    return res.status(500).json({message: "Server error"});
+  }
+});
 
 module.exports = router

@@ -40,7 +40,7 @@ const deliveryAgentSchema = new mongoose.Schema({
     },
   ],
   vehicleDetails: {
-    registrationNumber: {
+    vehicleNumber: {
       type: String,
       required: true,
     },
@@ -48,6 +48,10 @@ const deliveryAgentSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    vehicleImage: {
+      type: String,
+      default: "",
+    }
   },
   reviews: {
     rating: { type: Number, default: 0, min: 0, max: 5 },

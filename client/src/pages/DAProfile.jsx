@@ -452,12 +452,12 @@ export default function DeliveryAgentProfile() {
               <div className="relative">
                 <Car className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <input
-                  id="registrationNumber"
-                  name="registrationNumber"
+                  id="vehicleNumber"
+                  name="vehicleNumber"
                   value={
                     isEditing
-                      ? editData.vehicleDetails?.registrationNumber
-                      : profileData.vehicleDetails?.registrationNumber
+                      ? editData.vehicleDetails?.vehicleNumber
+                      : profileData.vehicleDetails?.vehicleNumber
                   }
                   onChange={handleInputChange}
                   disabled={!isEditing}

@@ -1,14 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { User, Mail, Phone, MapPin, Car, Lock } from "lucide-react"
-import axios from 'axios'
+import axios from "axios"
+import toast from "react-hot-toast"
 import { useAuthStore } from "../store/useStore";
 import { useNavigate } from "react-router-dom"
 
 export default function DeliveryAgentSignup() {
+
   const navigate = useNavigate();
   const { agentRegister } = useAuthStore();
+  const [vehicleImageFile, setVehicleImageFile] = useState(null)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,8 +20,14 @@ export default function DeliveryAgentSignup() {
     phone: "",
     address: "",
     location: "",
-    vehicleDetails: "",
+    vehicleNumber: "",
+    vehicleImage: null,
   })
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setVehicleImageFile(e.target.files[0])
+    }
+  }
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({})
 
@@ -63,7 +72,7 @@ export default function DeliveryAgentSignup() {
     else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ""))) newErrors.phone = "Phone number must be 10 digits"
     if (!formData.address.trim()) newErrors.address = "Address is required"
     if (!formData.location) newErrors.location = "Location is required"
-    if (!formData.vehicleDetails.trim()) newErrors.vehicleDetails = "Vehicle details are required"
+    if (!formData.vehicleNumber.trim()) newErrors.vehicleDetails = "Vehicle Number is required"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -76,11 +85,22 @@ export default function DeliveryAgentSignup() {
     if (!validateForm()) return
 
     setIsLoading(true)
-
-    const response = await agentRegister(formData);
-    if(response.success) {
+    const data = new FormData()
+    // Append text fields
+    Object.entries(formData).forEach(([key, value]) => {
+      data.append(key, value)
+    })
+    // Append image file if selected
+    if (vehicleImageFile) {
+      data.append("vehicleImage", vehicleImageFile)
+    } else {
+      setErrors({ form: "Vehicle image is required" })
+      return;
+    }
+    const response = await agentRegister(data);
+    if (response.success) {
       console.log("Delivery agent signup successful:", response.message)
-    }else{
+    } else {
       setErrors({ form: response.message || "Signup failed, please try again." })
     }
     setTimeout(() => {
@@ -113,9 +133,8 @@ export default function DeliveryAgentSignup() {
                     placeholder="Enter your full name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                      errors.name ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.name ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                 </div>
                 {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
@@ -134,9 +153,8 @@ export default function DeliveryAgentSignup() {
                     placeholder="Enter your email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                      errors.email ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.email ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                 </div>
                 {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
@@ -157,9 +175,8 @@ export default function DeliveryAgentSignup() {
                     placeholder="Enter password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                      errors.password ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.password ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                 </div>
                 {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
@@ -178,9 +195,8 @@ export default function DeliveryAgentSignup() {
                     placeholder="Confirm password"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                      errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                 </div>
                 {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword}</p>}
@@ -200,9 +216,8 @@ export default function DeliveryAgentSignup() {
                   placeholder="Enter your phone number"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.phone ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.phone ? "border-red-500" : "border-gray-300"
+                    }`}
                 />
               </div>
               {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
@@ -221,9 +236,8 @@ export default function DeliveryAgentSignup() {
                   value={formData.address}
                   onChange={handleInputChange}
                   rows={3}
-                  className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none ${
-                    errors.address ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none ${errors.address ? "border-red-500" : "border-gray-300"
+                    }`}
                 />
               </div>
               {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
@@ -239,9 +253,8 @@ export default function DeliveryAgentSignup() {
                   name="location"
                   value={formData.location}
                   onChange={(e) => handleSelectChange("location", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.location ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.location ? "border-red-500" : "border-gray-300"
+                    }`}
                 >
                   <option value="">Select your service location</option>
                   <option value="mumbai">Mumbai</option>
@@ -262,9 +275,8 @@ export default function DeliveryAgentSignup() {
                   placeholder="Enter your current location"
                   value={formData.pincode}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.pincode ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.pincode ? "border-red-500" : "border-gray-300"
+                    }`}
                 />
                 {errors.pincode && <p className="text-sm text-red-500">{errors.pincode}</p>}
               </div>
@@ -277,20 +289,29 @@ export default function DeliveryAgentSignup() {
               <div className="relative">
                 <Car className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <input
-                  id="vehicleDetails"
-                  name="vehicleDetails"
+                  id="vehicleNumber"
+                  name="vehicleNumber"
                   type="text"
                   placeholder="e.g., Honda Activa, MH12AB1234"
-                  value={formData.vehicleDetails}
+                  value={formData.vehicleNumber}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.vehicleDetails ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.vehicleDetails ? "border-red-500" : "border-gray-300"
+                    }`}
                 />
               </div>
               {errors.vehicleDetails && <p className="text-sm text-red-500">{errors.vehicleDetails}</p>}
             </div>
 
+            <div className="space-y-2">
+              <label htmlFor="vehicleImage">Vehicle Image</label>
+              <input
+                type="file"
+                id="vehicleImage"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+              {errors.form && <p className="text-red-600">{errors.form}</p>}
+            </div>
             <button
               type="submit"
               disabled={isLoading}
@@ -304,3 +325,129 @@ export default function DeliveryAgentSignup() {
     </div>
   )
 }
+
+// const DASignup = () => {
+//   const [formData, setFormData] = useState({
+//     name: "",
+//     email: "",
+//     phone: "",
+//     password: "",
+//     confirmPassword: "",
+//     phone: "",
+//     address: "",
+//     location: "",
+//     vehicleNumber: "",
+//     vehicleImage: null,
+//   })
+//   const [vehicleImageFile, setVehicleImageFile] = useState(null)
+//   const [errors, setErrors] = useState({})
+//   const [isLoading, setIsLoading] = useState(false)
+//   const navigate = useNavigate()
+
+//   const handleChange = (e) => {
+//     setFormData(prev => ({
+//       ...prev,
+//       [e.target.name]: e.target.value,
+//     }))
+//   }
+
+//   const handleFileChange = (e) => {
+//     if (e.target.files && e.target.files[0]) {
+//       setVehicleImageFile(e.target.files[0])
+//     }
+//   }
+
+//   const validateForm = () => {
+//     // Your validation logic here
+//     // Return true if valid, false otherwise
+//     return true
+//   }
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault()
+//     if (!validateForm()) return
+
+//     setIsLoading(true)
+//     try {
+//       const data = new FormData()
+//       // Append text fields
+//       Object.entries(formData).forEach(([key, value]) => {
+//         data.append(key, value)
+//       })
+//       // Append image file if selected
+//       if (vehicleImageFile) {
+//         data.append("vehicleImage", vehicleImageFile)
+//       }
+
+//       // Send form data with multipart/form-data header
+//       const response = await axios.post("/api/delivery-agent/register", data, {
+//         headers: {
+//           "Content-Type": "multipart/form-data",
+//         },
+//       })
+
+//       if (response.data.success) {
+//         // Success handling
+//         navigate("/login")
+//       } else {
+//         setErrors({ form: response.data.message || "Signup failed, please try again." })
+//       }
+//     } catch (error) {
+//       setErrors({ form: error.response?.data?.message || "Signup failed, please try again." })
+//     } finally {
+//       setIsLoading(false)
+//     }
+//   }
+
+//   return (
+//     <form onSubmit={handleSubmit}>
+//       {/* Other input fields */}
+//       <input
+//         type="text"
+//         name="name"
+//         value={formData.name}
+//         onChange={handleChange}
+//         placeholder="Name"
+//         required
+//       />
+//       <input
+//         type="email"
+//         name="email"
+//         value={formData.email}
+//         onChange={handleChange}
+//         placeholder="Email"
+//         required
+//       />
+//       <input
+//         type="tel"
+//         name="phone"
+//         value={formData.phone}
+//         onChange={handleChange}
+//         placeholder="Phone"
+//         required
+//       />
+//       <input
+//         type="password"
+//         name="password"
+//         value={formData.password}
+//         onChange={handleChange}
+//         placeholder="Password"
+//         required
+//       />
+//       {/* File input for vehicle image */}
+//       <label htmlFor="vehicleImage">Vehicle Image</label>
+//       <input
+//         type="file"
+//         id="vehicleImage"
+//         accept="image/*"
+//         onChange={handleFileChange}
+//       />
+//       {errors.form && <p className="text-red-600">{errors.form}</p>}
+//       <button type="submit" disabled={isLoading}>
+//         {isLoading ? "Registering..." : "Register"}
+//       </button>
+//     </form>
+//   )
+// }
+
+// export default DASignup

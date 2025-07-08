@@ -6,6 +6,7 @@ import axios from "axios"
 import toast from "react-hot-toast"
 import { useUIStore } from "../store/useStore"
 import ImageUpload from "../components/ImageUpload"
+import { User, Phone, Mail, MapPin, Truck, CheckCircle, XCircle, Clock } from "lucide-react"
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard")
@@ -179,6 +180,82 @@ const AdminDashboard = () => {
   const handleUpdateOrderStatus = (orderId, status) => {
     updateOrderStatusMutation.mutate({ orderId, status })
   }
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case true:
+        return <CheckCircle className="h-4 w-4" />
+      case false:
+        return <Clock className="h-4 w-4" />
+      default:
+        return <Clock className="h-4 w-4" />
+    }
+  }
+  const getStatusColor = (status) => {
+    switch (status) {
+      case true:
+        return "text-green-600 bg-green-50"
+      case false:
+        return "text-yellow-600 bg-yellow-50"
+      default:
+        return "text-gray-600 bg-gray-50"
+    }
+  }
+
+  const getAgentsData = async () => {
+    setAgentsLoading(true)
+    const response = await axios.get("/api/admin/agents");
+    if (response.data.success) {
+      let Agents = [];
+      console.log(response.data.agents, typeof response.data.agents)
+      for (const agent of response.data.agents) {
+        Agents.push({
+          ...agent.user,
+          id: agent._id,
+          agentVerified: agent.agentVerified,
+          vehicleDetails: agent.vehicleDetails,
+        });
+      }
+      // console.log(Agents);
+      setAgentsData(Agents);
+      setAgentsLoading(false);
+      return;
+    }
+    console.log(response.data.message);
+    setAgentsLoading(false);
+    return;
+  }
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState("");
+
+  const openImageModal = (imageUrl) => {
+    setModalImage(imageUrl);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalImage("");
+  };
+
+
+  const handleUpdateAgentStatus = async (agentId, newStatus) => {
+    setUpdateAgentStatusLoading(true)
+    let response;
+    if (newStatus == "verified") {
+      response = await axios.patch(`/api/admin/agents/${agentId}/verify`);
+    }
+    else {
+      response = await axios.patch(`/api/admin/agents/${agentId}/reject`);
+    }
+    if (response.data.success) {
+      toast.success(`Agent ${agentId} ${newStatus} successfully.`)
+    } else {
+      toast.error(`Agent Status update failed.`);
+    }
+  }
+  const [agentsLoading, setAgentsLoading] = useState(false)
+  const [updateAgentStatusLoading, setUpdateAgentStatusLoading] = useState(false)
+  const [agentsData, setAgentsData] = useState([])
 
   const handleImageUpload = (imageUrl, publicId) => {
     setNewProduct({
@@ -269,33 +346,42 @@ const AdminDashboard = () => {
             <nav className="flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab("dashboard")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "dashboard"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === "dashboard"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 Dashboard
               </button>
               <button
                 onClick={() => setActiveTab("products")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "products"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === "products"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 Products
               </button>
               <button
                 onClick={() => setActiveTab("orders")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "orders"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === "orders"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 Orders
+              </button>
+              <button
+                onClick={() => {
+                  getAgentsData();
+                  setActiveTab("Delivery Agents");
+                }}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === "Delivery Agents"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
+              >
+                Delivery Agents
               </button>
             </nav>
           </div>
@@ -317,13 +403,12 @@ const AdminDashboard = () => {
                         <div className="text-right">
                           <p className="font-semibold">₹{order.total.toFixed(2)}</p>
                           <span
-                            className={`px-2 py-1 rounded text-sm ${
-                              order.status === "delivered"
-                                ? "bg-green-100 text-green-800"
-                                : order.status === "pending"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-blue-100 text-blue-800"
-                            }`}
+                            className={`px-2 py-1 rounded text-sm ${order.status === "delivered"
+                              ? "bg-green-100 text-green-800"
+                              : order.status === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-blue-100 text-blue-800"
+                              }`}
                           >
                             {order.status}
                           </span>
@@ -464,6 +549,137 @@ const AdminDashboard = () => {
                 )}
               </div>
             )}
+
+            {activeTab === "Delivery Agents" && (
+              <div>
+                <h2 className="text-xl font-semibold mb-6">Delivery Agent Management</h2>
+                {agentsLoading ? (
+                  <div className="text-center py-8">
+                    <div className="loading-spinner mx-auto mb-4"></div>
+                    <p>Loading delivery agents...</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {agentsData?.map((agent) => (
+                      <div key={agent._id} className="border rounded-lg p-6 bg-white shadow-sm">
+                        <div className="flex flex-col lg:flex-row gap-6">
+                          {/* Agent Profile Section */}
+                          <div className="flex-1">
+                            <div className="flex items-start gap-4 mb-4">
+                              {/* <img
+                                src={agent.profileImage || "/placeholder.svg"}
+                                alt={`${agent.name} profile`}
+                                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                              /> */}
+                              <div className="flex-1">
+                                <div className="flex items-start mb-2">
+                                  <div>
+                                    <h3 className="font-semibold text-lg">Agent #{agent._id}</h3>
+                                    <p className="text-gray-800 font-medium">{agent.name}</p>
+                                  </div>
+                                  <div className="text-center pr-2 pl-2">
+                                    <div
+                                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(agent.agentVerified)}`}
+                                    >
+                                      {getStatusIcon(agent.agentVerified)}
+                                      {agent.agentVerified ? "Verified" : "Verifiaction Pending"}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                                  <div className="flex items-center gap-2">
+                                    <Mail className="h-4 w-4" />
+                                    <span>{agent.email}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Phone className="h-4 w-4" />
+                                    <span>{agent.phone}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <MapPin className="h-4 w-4" />
+                                    <span>{agent.location}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <User className="h-4 w-4" />
+                                    <span>Experience: {agent.address}</span>
+                                  </div>
+                                </div>
+
+                                <div className="mt-3 text-sm text-gray-600">
+                                  <p>Joined: {new Date(agent.createdAt).toLocaleDateString()}</p>
+                                  <p>Rating: ⭐ {agent.rating}/5</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Vehicle Information Section */}
+                          <div className="lg:w-80">
+                            <div className="border rounded-lg p-4 bg-gray-50">
+                              <div className="flex items-center gap-2 mb-3">
+                                <Truck className="h-5 w-5 text-gray-600" />
+                                <h4 className="font-medium">Vehicle Information</h4>
+                              </div>
+
+                              <img
+                                src={agent.vehicleDetails.vehicleImage || "/placeholder.svg"}
+                                alt={`${agent.name}`}
+                                className="w-full h-32 object-cover rounded-lg mb-3 border"
+                                onClick={() => openImageModal(agent.vehicleDetails.vehicleImage)}
+                              />
+                              {isModalOpen && (
+                                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50" onClick={closeModal}>
+                                  <img src={modalImage} alt="Vehicle" className="max-w-full max-h-full rounded-lg" />
+                                </div>
+                              )}
+
+                              <div className="space-y-2 text-sm">
+                                {/* <div className="flex justify-between">
+                                  <span className="text-gray-600">Type:</span>
+                                  <span className="font-medium">{agent.}</span>
+                                </div> */}
+                                <div className="flex justify-between">
+                                  <span className="text-gray-600">Number:</span>
+                                  <span className="font-medium">{agent.vehicleDetails.vehicleNumber}</span>
+                                </div>
+                                {/* <div className="flex justify-between">
+                                  <span className="text-gray-600">License:</span>
+                                  <span className="font-medium">{agent.licenseNumber}</span>
+                                </div> */}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        {!agent.agentVerified && (
+                          <div className="flex gap-3 mt-4 pt-4 border-t">
+                            <button
+                              onClick={() => handleUpdateAgentStatus(agent.id, "verified")}
+                              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                              disabled={updateAgentStatusLoading}
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                              Verify Agent
+                            </button>
+                            <button
+                              onClick={() => handleUpdateAgentStatus(agent.id, "rejected")}
+                              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                              disabled={updateAgentStatusLoading}
+                            >
+                              <XCircle className="h-4 w-4" />
+                              Reject Agent
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+            }
           </div>
         </div>
       </div>

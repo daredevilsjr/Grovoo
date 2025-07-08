@@ -315,9 +315,12 @@ router.post("/verify-otp", auth, async (req, res) => {
   }
 });
 
-router.post("/agent/register", async (req, res) => {
-  const { name, email, password, phone, address, location, vehicleDetails } =
+const { upload } = require("../config/cloudinary")
+
+router.post("/agent/register", upload.single("vehicleImage"), async (req, res) => {
+  const { name, email, password, phone, address, location, vehicleNumber } =
     req.body;
+    // console.log(req.body);
   if (
     !name ||
     !email ||
@@ -325,10 +328,16 @@ router.post("/agent/register", async (req, res) => {
     !phone ||
     !address ||
     !location ||
-    !vehicleDetails
+    !vehicleNumber
   ) {
     return res.status(400).json({ message: "All fields are required" });
   }
+  if (!req.file) {
+    console.log("No file");
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+  // console.log(req.file);
+  const imageUrl = req.file.path;
   try {
     const user = await User.create({
       name,
@@ -339,7 +348,7 @@ router.post("/agent/register", async (req, res) => {
       location,
       role: "delivery",
     });
-    const vehicleDetail = { registrationNumber: vehicleDetails, isVehicleVerified: false }
+    const vehicleDetail = { vehicleNumber: vehicleNumber, isVehicleVerified: false, vehicleImage: imageUrl }
     const deliveryAgent = await DeliveryAgent.create({
       user: user._id,
       vehicleDetails: vehicleDetail,
