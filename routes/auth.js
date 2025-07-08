@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const DeliveryAgent = require("../models/deliveryAgent");
+const DeliveryAgent = require("../models/DeliveryAgent");
 const { auth } = require("../middleware/auth");
 const sendEmail = require("../scripts/sendEmail");
 const bcrypt = require("bcryptjs");
