@@ -37,6 +37,7 @@ const orderSchema = new mongoose.Schema(
     deliveryAgent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "DeliveryAgent",
+      default: null,
     },
     items: [orderItemSchema],
     subtotal: {

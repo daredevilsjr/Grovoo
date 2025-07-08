@@ -8,24 +8,27 @@ const deliveryAgentSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  agentVerified : {
+  agentVerified: {
     type: Boolean,
     default: false,
   }
   ,
-  ordersAccepted: [
-    {
-      orders: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Order",
-        default: [],
-      },
-      acceptedAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-  ],
+  ordersAccepted: {
+    type: [
+      {
+        order: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Order"
+          // ❌ remove default here
+        },
+        acceptedAt: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ],
+    default: [] 
+  },
   ordersDelivered: [
     {
       orders: {

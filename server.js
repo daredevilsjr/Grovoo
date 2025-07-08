@@ -24,12 +24,18 @@ mongoose
   .catch((err) => console.log("MongoDB connection error:", err))
 
 // Routes
+app.use((req, res, next) => {
+  console.log(req.method, req.url);
+  next();
+});
+
 app.use("/api/auth", require("./routes/auth"))
 app.use("/api/products", require("./routes/products"))
 app.use("/api/orders", require("./routes/orders"))
 app.use("/api/admin", require("./routes/admin"))
 app.use("/api/upload", require("./routes/upload"))
 app.use("/api/payment", require("./routes/payment"))
+app.use("/api/agent", require("./routes/agent"))
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "client/build")))
