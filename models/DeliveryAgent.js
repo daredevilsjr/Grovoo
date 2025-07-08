@@ -60,5 +60,5 @@ const deliveryAgentSchema = new mongoose.Schema({
     reviewedAt: { type: Date, default: Date.now },
   },
 });
-const DeliveryAgent = mongoose.model("DeliveryAgent", deliveryAgentSchema);
+const DeliveryAgent = mongoose.models.DeliveryAgent || mongoose.model("DeliveryAgent", deliveryAgentSchema);
 module.exports = DeliveryAgent;
