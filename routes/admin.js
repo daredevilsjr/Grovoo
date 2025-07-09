@@ -3,7 +3,7 @@ const Order = require("../models/Order")
 const Product = require("../models/Product")
 const User = require("../models/User")
 const { adminAuth } = require("../middleware/auth")
-const DeliveryAgent = require("../models/deliveryAgent")
+const DeliveryAgent = require("../models/DeliveryAgent")
 const sendEmail = require("../scripts/sendEmail");
 const { randomBytes } = require("crypto");
 
@@ -24,8 +24,14 @@ router.get("/dashboard", adminAuth, async (req, res) => {
 
     // Recent orders
     const recentOrders = await Order.find()
-      .populate("user", "name email")
-      .populate("items.product", "name")
+      .populate([{ path: "user", select: "name email" }, { path: "items.product", select: "name" }, {
+        path: "deliveryAgent",
+        select: "user vehicleDetails.vehicleNumber agentVerified",
+        populate: {
+          path: "user",
+          select: "name phone"
+        }
+      }])
       .sort({ createdAt: -1 })
       .limit(10)
 
@@ -94,7 +100,7 @@ router.get("/orders", adminAuth, async (req, res) => {
 })
 function generateSecureString(length = 8) {
   const alphabet =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    "0123456789";
   const bytes = randomBytes(length);
   return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
 }

@@ -27,21 +27,24 @@ const deliveryAgentSchema = new mongoose.Schema({
         }
       }
     ],
-    default: [] 
+    default: []
   },
-  ordersDelivered: [
-    {
-      orders: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Order",
-        default: [],
+  ordersDelivered: {
+    type: [
+      {
+        order: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Order"
+          // ❌ remove default here
+        },
+        deliveredAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
-      deliveredAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-  ],
+    ],
+    default: []
+  },
   vehicleDetails: {
     vehicleNumber: {
       type: String,

@@ -63,20 +63,21 @@ export default function DeliveryAgentProfile() {
       setVerificationError("Invalid OTP. Please try again.")
     } finally { setIsVerifying(false); }
   }
+  const [refetch, setRefetch] = useState(false);
 
 
   useEffect(() => {
     const fetchProfileData = async () => {
       const response = await axios.get("/api/auth/profile", { withCredentials: true });
       if (response.data.success) {
-        console.log(response.data);
+        // console.log(response.data);
         const profile = response.data.profile;
         setProfileData({ ...profile.user, agentVerified: profile.agentVerified, vehicleDetails: profile.vehicleDetails, ordersAccepted: profile.ordersAccepted, ordersDelivered: profile.ordersDelivered, rating: profile.rating });
         setIsVerified(profile.user.isEmailVerified);
       }
     }
     fetchProfileData();
-  }, [])
+  }, [refetch])
 
   const [editData, setEditData] = useState({ ...profileData })
 
@@ -106,7 +107,7 @@ export default function DeliveryAgentProfile() {
         toast.success("Profile updated successfully!");
       }
       else toast.error("Something went wrong!");
-      setProfileData({...response.data.profile});
+      setRefetch(true);
       setIsEditing(false)
     }
     updateProfile();
@@ -164,7 +165,7 @@ export default function DeliveryAgentProfile() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">Orders Accepted</p>
-                <p className="text-2xl font-bold text-gray-900">{profileData.ordersAccepted}</p>
+                <p className="text-2xl font-bold text-gray-900">{profileData.ordersAccepted?.length}</p>
               </div>
             </div>
           </div>
@@ -176,7 +177,7 @@ export default function DeliveryAgentProfile() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">Orders Delivered</p>
-                <p className="text-2xl font-bold text-gray-900">{profileData.ordersDelivered}</p>
+                <p className="text-2xl font-bold text-gray-900">{profileData.ordersDelivered?.length}</p>
               </div>
             </div>
           </div>

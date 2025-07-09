@@ -442,8 +442,10 @@ const AdminDashboard = () => {
                           )}
                           {order.deliveryAgent && (
                             <>
-                              <p className="font-semibold">₹{order?.deliveryAgent?.name}</p>
-                              <p className="font-semibold">₹{order?.deliveryAgent?.email}</p>
+                              <p>Delivery Agent Details</p>
+                              <p className="font-semibold">{order?.deliveryAgent?.user.name}</p>
+                              <p className="font-semibold">{order?.deliveryAgent?.user.phone}</p>
+                              <p className="font-semibold">{order?.deliveryAgent?.vehicleDetails.vehicleNumber}</p>
                             </>
                           )}
                         </div>

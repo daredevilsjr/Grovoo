@@ -80,8 +80,19 @@ router.post("/", auth, async (req, res) => {
 router.get("/my-orders", auth, async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id })
-      .populate("items.product", "name image unit")
+      .populate([
+        { path: "items.product", select: "name image unit" },
+        {
+          path: "deliveryAgent",
+          select: "user vehicleDetails.vehicleNumber reviews.rating",
+          populate: {
+            path: "user",
+            select: "name phone"
+          }
+        }
+      ])
       .sort({ createdAt: -1 });
+
 
     res.json(orders);
   } catch (error) {
@@ -190,7 +201,7 @@ router.post("/available-orders", auth, async (req, res) => {
     if (req.user.role !== "delivery") {
       return res.status(403).json({ message: "Access denied" });
     }
-    const orders = await Order.find({ deliveryAgent: null })
+    const orders = await Order.find({ deliveryAgent: null, status: "confirmed" })
       .populate({
         path: "items.product",
         select: "name image unit",

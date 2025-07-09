@@ -111,8 +111,10 @@ const OrdersPage = () => {
                   )}
                   {order.deliveryAgent && (
                     <>
-                      <p className="font-semibold">₹{order?.deliveryAgent?.name}</p>
-                      <p className="font-semibold">₹{order?.deliveryAgent?.email}</p>
+                      <p>Delivery Agent Details</p>
+                      <p className="font-semibold">Name: {order?.deliveryAgent?.user.name}</p>
+                      <p className="font-semibold">Phone: {order?.deliveryAgent?.user.phone}</p>
+                      <p className="font-semibold">Vehicle Number: {order?.deliveryAgent?.vehicleDetails.vehicleNumber}</p>
                     </>
                   )}
                   {order.estimatedDelivery && (

@@ -398,7 +398,7 @@ router.put("/profile", auth, async (req, res) => {
     user.isActive = isActive || user.isActive;
     user.location = location || user.location;
     await user.save();
-    return res.status(200).json({ message: "Profile updated successfully", profile: user });
+    return res.status(200).json({ success: true, message: "Profile updated successfully", profile: user });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Server Error" });
