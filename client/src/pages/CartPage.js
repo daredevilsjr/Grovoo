@@ -3,13 +3,21 @@
 import { useNavigate } from "react-router-dom"
 import { useAuthStore, useCartStore } from "../store/useStore"
 import toast from "react-hot-toast"
+import { useEffect } from "react"
 
 const CartPage = () => {
-  const { cart, updateQuantity, removeFromCart, getCartTotal, getCartItemsCount } = useCartStore()
+  // const { cart, updateQuantity, removeFromCart, getCartTotal, getCartItemsCount } = useCartStore()
   const { selectedLocation, user } = useAuthStore()
   const navigate = useNavigate()
 
-  const subtotal = getCartTotal(selectedLocation)
+  const { cart, updateQuantity, removeFromCart, getCartTotal, hydrated, hydrateCart  } = useCartStore();
+  // const { selectedLocation } = useAuthStore();
+  useEffect(() => {
+    hydrateCart(selectedLocation);
+  }, [hydrateCart, selectedLocation]);
+  if (!hydrated) return null;
+
+  const subtotal = getCartTotal(selectedLocation);
   const tax = subtotal * 0.18 // 18% GST
   const deliveryFee = subtotal > 1000 ? 0 : 50
   const total = subtotal + tax + deliveryFee
@@ -112,7 +120,7 @@ const CartPage = () => {
 
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
-                  <span>Subtotal ({getCartItemsCount()} items)</span>
+                  {/* <span>Subtotal ({getCartItemsCount()} items)</span> */}
                   <span>₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
@@ -153,7 +161,7 @@ const CartPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 

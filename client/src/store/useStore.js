@@ -92,7 +92,7 @@ export const useAuthStore = create(
               }
             }
           );
-          
+
           const { token, user } = response.data;
 
           localStorage.setItem("token", token);
@@ -210,136 +210,281 @@ export const useProductsStore = create((set, get) => ({
   },
 }));
 
+// export const useCartStore = create(
+//   persist(
+//     (set, get) => ({
+//       cart: [],
+
+//       addToCart: (product, quantity = 1) => {
+//         const { cart } = get();
+//         const existingItem = cart.find((item) => item._id === product._id);
+
+//         // Get the latest product stock from products store
+//         const products = useProductsStore.getState().products;
+//         const productInStore = products.find((p) => p._id === product._id);
+
+//         // Debug logs
+//         if (!productInStore) {
+//           console.warn("Product not found in products store:", product._id);
+//           return;
+//         }
+
+//         const stock =
+//           typeof productInStore.stock === "number" ? productInStore.stock : 0;
+
+//         // If no stock, do not add
+//         if (stock <= 0) {
+//           console.warn("Product has no stock:", product._id);
+//           return;
+//         }
+
+//         let newQuantity = quantity;
+//         if (existingItem) {
+//           newQuantity = existingItem.quantity + quantity;
+//         }
+//         if (newQuantity > stock) {
+//           toast.error("Max Quantity Reached");
+//         } else {
+//           toast.success(
+//             <div className="flex items-center">
+//               <span>{product.name} added to cart!</span>
+//             </div>
+//           );
+//         }
+//         // Clamp to available stock
+//         newQuantity = Math.min(newQuantity, stock);
+
+//         // Do not add if clamped quantity is less than 1
+//         if (newQuantity < 1) {
+//           console.warn("Attempted to add less than 1 quantity:", product._id);
+//           return;
+//         }
+
+//         if (existingItem) {
+//           set({
+//             cart: cart.map((item) =>
+//               item._id === product._id
+//                 ? { ...item, quantity: newQuantity }
+//                 : item
+//             ),
+//           });
+//         } else {
+//           set({ cart: [...cart, { ...product, quantity: newQuantity }] });
+//         }
+//       },
+
+//       removeFromCart: (productId) => {
+//         const { cart } = get();
+//         set({ cart: cart.filter((item) => item._id !== productId) });
+//       },
+
+//       updateQuantity: (productId, quantity) => {
+//         const { cart } = get();
+//         const products = useProductsStore.getState().products;
+//         const productInStore = products.find((p) => p._id === productId);
+
+//         // Debug logs
+//         if (!productInStore) {
+//           console.warn(
+//             "Product not found in products store (update):",
+//             productId
+//           );
+//           get().removeFromCart(productId);
+//           return;
+//         }
+
+//         const stock =
+//           typeof productInStore.stock === "number" ? productInStore.stock : 0;
+
+//         // Remove if no stock or requested quantity is less than 1
+//         if (stock <= 0 || quantity < 1) {
+//           console.warn("No stock or quantity < 1 (update):", productId);
+//           get().removeFromCart(productId);
+//           return;
+//         }
+
+//         // Clamp quantity to available stock
+//         if (quantity >= stock) {
+//           toast.error("Max Quantity Reached");
+//         }
+//         const clampedQuantity = Math.min(quantity, stock);
+
+//         set({
+//           cart: cart.map((item) =>
+//             item._id === productId
+//               ? { ...item, quantity: clampedQuantity }
+//               : item
+//           ),
+//         });
+//       },
+
+//       clearCart: () => set({ cart: [] }),
+
+//       getCartTotal: (location) => {
+//         const { cart } = get();
+//         return cart.reduce((total, item) => {
+//           return total + item.price[location] * item.quantity;
+//         }, 0);
+//       },
+
+//       getCartItemsCount: () => {
+//         const { cart } = get();
+//         return cart.reduce((total, item) => total + item.quantity, 0);
+//       },
+//     }),
+//     {
+//       name: "cart-storage",
+//       partialize: (state) => ({ cart: state.cart }),
+//     }
+//   )
+// );
+
+
+// UI Store
+
+
+
 export const useCartStore = create(
+
   persist(
     (set, get) => ({
+      /* -----------------------------------------
+       *  Main state
+       * --------------------------------------- */
       cart: [],
 
-      addToCart: (product, quantity = 1) => {
+      /* -----------------------------------------
+       *  Actions
+       * --------------------------------------- */
+      addToCart: (product, qty = 1) => {
         const { cart } = get();
-        const existingItem = cart.find((item) => item._id === product._id);
+        const existing = cart.find((i) => i._id === product._id);
+        const currentStock =
+          typeof product.stock === "number" ? product.stock : 0;
 
-        // Get the latest product stock from products store
-        const products = useProductsStore.getState().products;
-        const productInStore = products.find((p) => p._id === product._id);
-
-        // Debug logs
-        if (!productInStore) {
-          console.warn("Product not found in products store:", product._id);
+        if (currentStock <= 0) {
+          toast.error("Product is out of stock");
           return;
         }
 
-        const stock =
-          typeof productInStore.stock === "number" ? productInStore.stock : 0;
+        let newQty = qty;
+        if (existing) newQty = existing.quantity + qty;
 
-        // If no stock, do not add
-        if (stock <= 0) {
-          console.warn("Product has no stock:", product._id);
+        if (newQty > currentStock) {
+          toast.error("Max quantity reached");
           return;
         }
 
-        let newQuantity = quantity;
-        if (existingItem) {
-          newQuantity = existingItem.quantity + quantity;
-        }
-        if (newQuantity > stock) {
-          toast.error("Max Quantity Reached");
-        } else {
-          toast.success(
-            <div className="flex items-center">
-              <span>{product.name} added to cart!</span>
-            </div>
-          );
-        }
-        // Clamp to available stock
-        newQuantity = Math.min(newQuantity, stock);
+        const nextCart = existing
+          ? cart.map((i) =>
+            i._id === product._id ? { ...i, quantity: newQty } : i
+          )
+          : [...cart, { ...product, quantity: newQty }];
 
-        // Do not add if clamped quantity is less than 1
-        if (newQuantity < 1) {
-          console.warn("Attempted to add less than 1 quantity:", product._id);
+        set({ cart: nextCart });
+        toast.success("Item added to cart");
+      },
+
+      updateQuantity: (productId, nextQty) => {
+        const { cart } = get();
+        const line = cart.find((i) => i._id === productId);
+        if (!line) return;
+
+        if (nextQty <= 0) {
+          get().removeFromCart(productId);
           return;
         }
 
-        if (existingItem) {
-          set({
-            cart: cart.map((item) =>
-              item._id === product._id
-                ? { ...item, quantity: newQuantity }
-                : item
-            ),
-          });
-        } else {
-          set({ cart: [...cart, { ...product, quantity: newQuantity }] });
+        if (nextQty > line.stock) {
+          toast.error("Max quantity reached");
+          return;
         }
+
+        const nextCart = cart.map((i) =>
+          i._id === productId ? { ...i, quantity: nextQty } : i
+        );
+        set({ cart: nextCart });
       },
 
       removeFromCart: (productId) => {
         const { cart } = get();
-        set({ cart: cart.filter((item) => item._id !== productId) });
-      },
-
-      updateQuantity: (productId, quantity) => {
-        const { cart } = get();
-        const products = useProductsStore.getState().products;
-        const productInStore = products.find((p) => p._id === productId);
-
-        // Debug logs
-        if (!productInStore) {
-          console.warn(
-            "Product not found in products store (update):",
-            productId
-          );
-          get().removeFromCart(productId);
-          return;
-        }
-
-        const stock =
-          typeof productInStore.stock === "number" ? productInStore.stock : 0;
-
-        // Remove if no stock or requested quantity is less than 1
-        if (stock <= 0 || quantity < 1) {
-          console.warn("No stock or quantity < 1 (update):", productId);
-          get().removeFromCart(productId);
-          return;
-        }
-
-        // Clamp quantity to available stock
-        if (quantity >= stock) {
-          toast.error("Max Quantity Reached");
-        }
-        const clampedQuantity = Math.min(quantity, stock);
-
-        set({
-          cart: cart.map((item) =>
-            item._id === productId
-              ? { ...item, quantity: clampedQuantity }
-              : item
-          ),
-        });
+        const nextCart = cart.filter((i) => i._id !== productId);
+        set({ cart: nextCart });
       },
 
       clearCart: () => set({ cart: [] }),
 
-      getCartTotal: (location) => {
-        const { cart } = get();
-        return cart.reduce((total, item) => {
-          return total + item.price[location] * item.quantity;
-        }, 0);
+      /* -----------------------------------------
+       *  Hydration
+       * --------------------------------------- */
+      hydrateCart: async (location) => {
+        set({ hydrated: false });
+        const persistedLines =
+          JSON.parse(localStorage.getItem("cart-storage") ?? "{}")?.state
+            ?.cart || [];
+
+        if (!persistedLines.length) return;
+
+        // 1. Ask backend for fresh product docs
+        const { data: products } = await axios.post("/api/products/bulk", {
+          ids: persistedLines.map((l) => l._id),
+        });
+
+        // 2. Merge quantity with the fresh product data
+        const merged = persistedLines
+          .map((line) => {
+            const p = products.find((pr) => pr._id === line._id);
+            if (!p) return null; // product was deleted
+            return { ...p, quantity: line.quantity };
+          })
+          .filter(Boolean);
+
+        // 3. Push to in-memory state
+        set({ cart: merged, hydrated: true });
+
+        // 4. Sync products to global ProductsStore so other pages get the latest
+        useProductsStore.getState().setProducts(products);
       },
 
-      getCartItemsCount: () => {
-        const { cart } = get();
-        return cart.reduce((total, item) => total + item.quantity, 0);
-      },
+      /* -----------------------------------------
+       *  Selectors
+       * --------------------------------------- */
+      getCartTotal: (location) =>
+        get().cart.reduce((sum, item) => {
+          const priceObj = item.price || {};          // handle undefined
+          const unitPrice = priceObj[location] ?? 0;  // handle missing city key
+          return sum + unitPrice * item.quantity;
+        }, 0),
+
+
+      getCartItemsCount: () => get().cart.reduce((n, i) => n + i.quantity, 0),
     }),
+
+    /* -------------------------------------------
+     *  Persistence settings
+     * ----------------------------------------- */
     {
       name: "cart-storage",
-      partialize: (state) => ({ cart: state.cart }),
+      partialize: (state) => ({
+        // Only keep id & qty → prevents stale prices
+        cart: state.cart.map(({ _id, quantity }) => ({ _id, quantity })),
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Automatically refresh prices right after rehydration
+        const location = useAuthStore.getState().selectedLocation;
+        state?.hydrateCart(location);
+      },
     }
   )
 );
 
-// UI Store
+
+
+
+
+
+
+
 export const useUIStore = create((set) => ({
   showMobileMenu: false,
   showUserMenu: false,

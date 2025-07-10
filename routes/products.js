@@ -143,6 +143,27 @@ router.patch("/bulk-update", adminAuth, async (req, res) => {
     res.status(500).json({ message: "Server error" })
   }
 })
+router.post("/bulk", async (req, res) => {
+  try {
+    const { ids } = req.body;
+
+    // Validate input
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: "ids must be a non-empty array" });
+    }
+
+    // Grab only active products whose _id is in the list
+    const products = await Product.find({
+      _id: { $in: ids },
+      isActive: true,
+    }).populate("createdBy", "name");
+
+    res.json(products);
+  } catch (err) {
+    console.error("Bulk fetch error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 // Update product stock (Admin only)
 router.patch("/:id/stock", adminAuth, async (req, res) => {
