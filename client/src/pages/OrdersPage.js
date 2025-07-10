@@ -97,7 +97,7 @@ const OrdersPage = () => {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-lg font-semibold">Order #{order._id.slice(-8)}</h3>
-                  <p className="text-gray-600">Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
+                  <p className="text-gray-600">Placed on {new Date(order.createdAt).toLocaleDateString('en-GB')}</p>
                   <p className="text-gray-600">
                     Location: {order.location.charAt(0).toUpperCase() + order.location.slice(1)}
                   </p>
@@ -119,7 +119,7 @@ const OrdersPage = () => {
                   )}
                   {order.estimatedDelivery && (
                     <p className="text-sm text-gray-600 mt-2">
-                      Est. Delivery: {new Date(order.estimatedDelivery).toLocaleDateString()}
+                      Est. Delivery: {new Date(order.estimatedDelivery).toLocaleDateString('en-GB')}
                     </p>
                   )}
                 </div>
