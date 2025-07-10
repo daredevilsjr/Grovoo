@@ -59,7 +59,7 @@ const userSchema = new mongoose.Schema(
     },
     businessName: {
       type: String,
-      default: "Grovoo Associated Bussiness"
+      default: "1StopMandi Associated Bussiness"
     },
     licenseNumber: {
       type: String,

@@ -11,7 +11,7 @@ const sendEmail = async (to, subject, html) => {
     });
 
     const mailOptions = {
-      from: `"EasyTrips Support" <${process.env.MAIL_USER}>`,
+      from: `"1StopMandi Support" <${process.env.MAIL_USER}>`,
       to,
       subject,
       html,
