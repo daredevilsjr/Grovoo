@@ -320,7 +320,7 @@ const { upload } = require("../config/cloudinary")
 router.post("/agent/register", upload.single("vehicleImage"), async (req, res) => {
   const { name, email, password, phone, address, location, vehicleNumber } =
     req.body;
-    // console.log(req.body);
+  // console.log(req.body);
   if (
     !name ||
     !email ||
@@ -392,12 +392,15 @@ router.put("/profile", auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    user.name = name || user.name;
-    user.phone = phone || user.phone;
-    user.address = address || user.address;
-    user.isActive = isActive || user.isActive;
-    user.location = location || user.location;
+    console.log(name, phone, address, isActive, location);
+    if (name !== undefined) user.name = name;
+    if (phone !== undefined) user.phone = phone;
+    if (address !== undefined) user.address = address;
+    if (isActive !== undefined) user.isActive = isActive;
+    if (location !== undefined) user.location = location;
     await user.save();
+    console.log(user);
+
     return res.status(200).json({ success: true, message: "Profile updated successfully", profile: user });
   } catch (err) {
     console.log(err);

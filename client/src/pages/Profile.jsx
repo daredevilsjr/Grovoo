@@ -1006,8 +1006,18 @@ export default function Profile() {
 
   const handleSave = () => {
     setProfileData({ ...editData })
-    setIsEditing(false)
-    setHasChanges(false)
+    const updateProfile = async () => {
+      const response = await axios.put("/api/auth/profile", editData);
+      console.log(response.data);
+      if (response.data.success) {
+        toast.success("Profile Updated Successfully");
+        setIsEditing(false)
+        setHasChanges(false)
+        return;
+      }
+      toast.error("Some Error Ocuurred");
+    }
+    updateProfile();
     console.log("Profile saved:", editData)
   }
 
@@ -1275,11 +1285,10 @@ export default function Profile() {
                       value={isEditing ? editData.name : profileData.name}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${
-                        !isEditing
-                          ? "bg-gray-50 border-gray-200 text-gray-500"
-                          : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-                      }`}
+                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${!isEditing
+                        ? "bg-gray-50 border-gray-200 text-gray-500"
+                        : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                        }`}
                     />
                   </div>
 
@@ -1317,11 +1326,10 @@ export default function Profile() {
                       <button
                         onClick={sendOtp}
                         disabled={isVerified || isVerifying}
-                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                          isVerified
-                            ? "bg-green-100 text-green-600 cursor-not-allowed"
-                            : "bg-blue-100 text-blue-600 hover:bg-blue-200"
-                        }`}
+                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isVerified
+                          ? "bg-green-100 text-green-600 cursor-not-allowed"
+                          : "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                          }`}
                       >
                         {isVerified ? "Verified" : "Not Verified"}
                       </button>
@@ -1330,13 +1338,11 @@ export default function Profile() {
                       type="email"
                       name="email"
                       value={isEditing ? editData.email : profileData.email}
-                      onChange={handleInputChange}
-                      disabled={!isEditing}
-                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${
-                        !isEditing
-                          ? "bg-gray-50 border-gray-200 text-gray-500"
-                          : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-                      }`}
+                      disabled
+                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${!isEditing
+                        ? "bg-gray-50 border-gray-200 text-gray-500"
+                        : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                        }`}
                     />
                   </div>
 
@@ -1402,11 +1408,10 @@ export default function Profile() {
                       value={isEditing ? editData.phone : profileData.phone}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${
-                        !isEditing
-                          ? "bg-gray-50 border-gray-200 text-gray-500"
-                          : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-                      }`}
+                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${!isEditing
+                        ? "bg-gray-50 border-gray-200 text-gray-500"
+                        : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                        }`}
                     />
                   </div>
                 </div>
@@ -1422,11 +1427,10 @@ export default function Profile() {
                     onChange={handleInputChange}
                     disabled={!isEditing}
                     rows={4}
-                    className={`w-full px-3 py-2.5 border rounded-lg transition-all duration-200 resize-none ${
-                      !isEditing
-                        ? "bg-gray-50 border-gray-200 text-gray-500"
-                        : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-                    }`}
+                    className={`w-full px-3 py-2.5 border rounded-lg transition-all duration-200 resize-none ${!isEditing
+                      ? "bg-gray-50 border-gray-200 text-gray-500"
+                      : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                      }`}
                   />
                 </div>
               </div>
@@ -1455,11 +1459,10 @@ export default function Profile() {
                       value={isEditing ? editData.businessName : profileData.businessName}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${
-                        !isEditing
-                          ? "bg-gray-50 border-gray-200 text-gray-500"
-                          : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-                      }`}
+                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${!isEditing
+                        ? "bg-gray-50 border-gray-200 text-gray-500"
+                        : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                        }`}
                     />
                   </div>
 
@@ -1497,11 +1500,10 @@ export default function Profile() {
                       value={isEditing ? editData.gstNumber : profileData.gstNumber}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${
-                        !isEditing
-                          ? "bg-gray-50 border-gray-200 text-gray-500"
-                          : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-                      }`}
+                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${!isEditing
+                        ? "bg-gray-50 border-gray-200 text-gray-500"
+                        : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                        }`}
                     />
                   </div>
 
@@ -1512,11 +1514,10 @@ export default function Profile() {
                       value={isEditing ? editData.licenseNumber : profileData.licenseNumber}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${
-                        !isEditing
-                          ? "bg-gray-50 border-gray-200 text-gray-500"
-                          : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-                      }`}
+                      className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${!isEditing
+                        ? "bg-gray-50 border-gray-200 text-gray-500"
+                        : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                        }`}
                     />
                   </div>
                 </div>
@@ -1560,11 +1561,10 @@ export default function Profile() {
                           value={isEditing ? editData.vehicleNumber : profileData.vehicleNumber}
                           onChange={handleInputChange}
                           disabled={!isEditing}
-                          className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${
-                            !isEditing
-                              ? "bg-gray-50 border-gray-200 text-gray-500"
-                              : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-                          }`}
+                          className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${!isEditing
+                            ? "bg-gray-50 border-gray-200 text-gray-500"
+                            : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                            }`}
                         />
                       </div>
 
@@ -1575,11 +1575,10 @@ export default function Profile() {
                           value={isEditing ? editData.drivingLicense : profileData.drivingLicense}
                           onChange={handleInputChange}
                           disabled={!isEditing}
-                          className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${
-                            !isEditing
-                              ? "bg-gray-50 border-gray-200 text-gray-500"
-                              : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-                          }`}
+                          className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${!isEditing
+                            ? "bg-gray-50 border-gray-200 text-gray-500"
+                            : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                            }`}
                         />
                       </div>
 
@@ -1590,11 +1589,10 @@ export default function Profile() {
                           value={isEditing ? editData.deliveryZone : profileData.deliveryZone}
                           onChange={handleInputChange}
                           disabled={!isEditing}
-                          className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${
-                            !isEditing
-                              ? "bg-gray-50 border-gray-200 text-gray-500"
-                              : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-                          }`}
+                          className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${!isEditing
+                            ? "bg-gray-50 border-gray-200 text-gray-500"
+                            : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                            }`}
                         />
                       </div>
                     </div>
@@ -1711,18 +1709,16 @@ export default function Profile() {
                           type="button"
                           onClick={() => (!isEditing ? null : handleSwitchChange(key, !editData[key]))}
                           disabled={!isEditing}
-                          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 transform hover:scale-105 ${
-                            (isEditing ? editData[key] : profileData[key])
-                              ? "bg-gradient-to-r from-purple-500 to-indigo-600 shadow-lg shadow-purple-200"
-                              : "bg-gray-300 hover:bg-gray-400"
-                          } ${!isEditing ? "opacity-50 cursor-not-allowed hover:scale-100" : "cursor-pointer"}`}
+                          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 transform hover:scale-105 ${(isEditing ? editData[key] : profileData[key])
+                            ? "bg-gradient-to-r from-purple-500 to-indigo-600 shadow-lg shadow-purple-200"
+                            : "bg-gray-300 hover:bg-gray-400"
+                            } ${!isEditing ? "opacity-50 cursor-not-allowed hover:scale-100" : "cursor-pointer"}`}
                         >
                           <span
-                            className={`inline-block h-5 w-5 transform rounded-full bg-white transition-all duration-300 shadow-lg ${
-                              (isEditing ? editData[key] : profileData[key])
-                                ? "translate-x-6 shadow-purple-200"
-                                : "translate-x-1"
-                            }`}
+                            className={`inline-block h-5 w-5 transform rounded-full bg-white transition-all duration-300 shadow-lg ${(isEditing ? editData[key] : profileData[key])
+                              ? "translate-x-6 shadow-purple-200"
+                              : "translate-x-1"
+                              }`}
                           />
                         </button>
                       </div>
