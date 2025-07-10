@@ -82,7 +82,7 @@ const OrderConfirmationPage = () => {
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <p className="text-green-800 font-semibold">Order ID: #{order._id.slice(-8)}</p>
               <p className="text-green-700 text-sm">
-                Estimated delivery: {new Date(order.estimatedDelivery).toLocaleDateString()} by 6 PM
+                Estimated delivery: {new Date(order.estimatedDelivery).toLocaleDateString('en-GB')} by 6 PM
               </p>
             </div>
           </div>

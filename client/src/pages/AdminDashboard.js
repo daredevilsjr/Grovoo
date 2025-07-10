@@ -423,7 +423,7 @@ const AdminDashboard = () => {
                           <p className="text-gray-600">Phone: {order.user?.phone}</p>
                           <p className="text-gray-600">Address: {order.user?.address}</p>
                           <p className="text-gray-600">Gstin: {order.user?.gstin}</p>
-                          <p className="text-gray-600">Date: {new Date(order.createdAt).toLocaleDateString()}</p>
+                          <p className="text-gray-600">Date: {new Date(order.createdAt).toLocaleDateString('en-GB')}</p>
                           <p className="text-gray-600">Location: {order.location}</p>
                         </div>
                         <div>
@@ -576,7 +576,7 @@ const AdminDashboard = () => {
                             <p className="text-gray-600">Phone: {order.user?.phone}</p>
                             <p className="text-gray-600">Address: {order.user?.address}</p>
                             <p className="text-gray-600">Gstin: {order.user?.gstin}</p>
-                            <p className="text-gray-600">Date: {new Date(order.createdAt).toLocaleDateString()}</p>
+                            <p className="text-gray-600">Date: {new Date(order.createdAt).toLocaleDateString('en-GB')}</p>
                             <p className="text-gray-600">Location: {order.location}</p>
                             <p className="text-gray-600">Notes: {order.notes}</p>
                           </div>
@@ -696,7 +696,7 @@ const AdminDashboard = () => {
                                 </div>
 
                                 <div className="mt-3 text-sm text-gray-600">
-                                  <p>Joined: {new Date(agent.createdAt).toLocaleDateString()}</p>
+                                  <p>Joined: {new Date(agent.createdAt).toLocaleDateString('en-GB')}</p>
                                   <p>Rating: ⭐ {agent.rating}/5</p>
                                 </div>
                               </div>

@@ -475,7 +475,7 @@
 //                   <InfoCard
 //                     icon={Calendar}
 //                     label="Member Since"
-//                     value={new Date(profileData?.joined).toLocaleDateString()}
+//                     value={new Date(profileData?.joined).toLocaleDateString('en-GB')}
 //                   />
 //                   {/* <InfoCard icon={Clock} label="Last Active" value={profileData?.lastActive} /> */}
 //                 </div>
@@ -1253,7 +1253,7 @@ export default function Profile() {
                   <InfoCard
                     icon={Calendar}
                     label="Member Since"
-                    value={new Date(profileData?.joined).toLocaleDateString()}
+                    value={new Date(profileData?.joined).toLocaleDateString('en-GB')}
                   />
                   <InfoCard
                     icon={MapPin}
