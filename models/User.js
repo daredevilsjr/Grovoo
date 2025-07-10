@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["hotel", "admin" , "delivery"],
+      enum: ["hotel", "admin", "delivery"],
       default: "hotel",
     },
     phone: {
@@ -50,12 +50,24 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    passwordResetToken: {
+      type: String,
+    },
+    businessType: {
+      type: String,
+      default: "hotel",
+    },
+    businessName: {
+      type: String,
+      default: "Grovoo Associated Bussiness"
+    },
+    licenseNumber: {
+      type: String,
+      default: "",
+    },
     gstin: {
       type: String,
       trim: true,
-    },
-    passwordResetToken: {
-      type: String,
     },
     passwordResetExpires: {
       type: Date,

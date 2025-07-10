@@ -43,7 +43,7 @@
 //     role: "hotel",
 //     address: "123 Business District, Mumbai, Maharashtra 400001",
 //     businessName: "Singh's Restaurant",
-//     gstNumber: "27ABCDE1234F1Z5",
+//     gstin: "27ABCDE1234F1Z5",
 //     licenseNumber: "FSSAI-12345678901234",
 //     joinDate: "2023-01-15",
 //     lastActive: "2024-01-15 10:30 AM",
@@ -679,9 +679,9 @@
 //                   <div className="space-y-3 group">
 //                     <label className="text-sm font-semibold text-gray-700">GST Number</label>
 //                     <Input
-//                       value={profileData?.gstNumber}
+//                       value={profileData?.gstin}
 //                       disabled={!isEditing}
-//                       onChange={(e) => handleInputChange("gstNumber", e.target.value)}
+//                       onChange={(e) => handleInputChange("gstin", e.target.value)}
 //                     />
 //                   </div>
 
@@ -896,7 +896,7 @@ export default function Profile() {
     role: "hotel",
     address: "123 Business District, Mumbai, Maharashtra 400001",
     businessName: "Singh's Restaurant",
-    gstNumber: "27ABCDE1234F1Z5",
+    gstin: "27ABCDE1234F1Z5",
     licenseNumber: "FSSAI-12345678901234",
     joinDate: "2023-01-15",
     lastActive: "2024-01-15 10:30 AM",
@@ -1301,7 +1301,7 @@ export default function Profile() {
                       <select
                         name="role"
                         value={editData.role}
-                        onChange={handleInputChange}
+                        disabled
                         className="w-full h-11 px-3 border border-gray-300 rounded-lg bg-white hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
                       >
                         <option value="admin">Admin</option>
@@ -1496,8 +1496,8 @@ export default function Profile() {
                   <div className="space-y-3 group">
                     <label className="text-sm font-semibold text-gray-700">GST Number</label>
                     <input
-                      name="gstNumber"
-                      value={isEditing ? editData.gstNumber : profileData.gstNumber}
+                      name="gstin"
+                      value={isEditing ? editData.gstin : profileData.gstin}
                       onChange={handleInputChange}
                       disabled={!isEditing}
                       className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${!isEditing

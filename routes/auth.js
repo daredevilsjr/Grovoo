@@ -392,12 +392,19 @@ router.put("/profile", auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    console.log(name, phone, address, isActive, location);
     if (name !== undefined) user.name = name;
     if (phone !== undefined) user.phone = phone;
     if (address !== undefined) user.address = address;
     if (isActive !== undefined) user.isActive = isActive;
     if (location !== undefined) user.location = location;
+
+    if (user.role === "hotel") {
+      const { businessType, businessName, licenseNumber, gstin } = req.body;
+      if (businessName !== undefined) user.businessName = businessName;
+      if (businessType !== undefined) user.businessType = businessType;
+      if (licenseNumber !== undefined) user.licenseNumber = licenseNumber;
+      if (gstin !== undefined) user.gstin = gstin;
+    }
     await user.save();
     console.log(user);
 
