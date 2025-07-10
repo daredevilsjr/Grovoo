@@ -12,6 +12,7 @@ const RegisterPage = () => {
     password: "",
     confirmPassword: "",
     role: "hotel",
+    gstin: "",
     phone: "",
     address: "",
     location: "mumbai",
@@ -150,7 +151,18 @@ const RegisterPage = () => {
               placeholder="Enter your address"
             ></textarea>
           </div>
-
+          {formData.role==="hotel" && (<div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">gstin</label>
+            <textarea
+              name="gstin"
+              value={formData.gstin}
+              onChange={handleChange}
+              rows="3"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your gstin"
+            ></textarea>
+          </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <input

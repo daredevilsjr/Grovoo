@@ -24,7 +24,7 @@ router.get("/dashboard", adminAuth, async (req, res) => {
 
     // Recent orders
     const recentOrders = await Order.find()
-      .populate([{ path: "user", select: "name email" }, { path: "items.product", select: "name" }, {
+      .populate([{ path: "user", select: "name email phone address gstin " }, { path: "items.product", select: "name" }, {
         path: "deliveryAgent",
         select: "user vehicleDetails.vehicleNumber agentVerified",
         populate: {
@@ -80,7 +80,7 @@ router.get("/orders", adminAuth, async (req, res) => {
     }
 
     const orders = await Order.find(query)
-      .populate("user", "name email")
+      .populate("user", "name email phone address gstin")
       .populate("items.product", "name")
       .sort({ createdAt: -1 })
       .limit(limit * 1)

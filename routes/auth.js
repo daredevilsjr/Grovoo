@@ -13,7 +13,7 @@ const router = express.Router();
 // Register
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password, role, phone, address, location } = req.body;
+    const { name, email, password, role, phone, address, gstin, location } = req.body;
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -28,6 +28,7 @@ router.post("/register", async (req, res) => {
       password,
       role: role || "hotel",
       phone,
+      gstin,
       address,
       location: location || "mumbai",
     });

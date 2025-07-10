@@ -419,9 +419,26 @@ const AdminDashboard = () => {
                         <div>
                           <h3 className="font-semibold">Order #{order._id.slice(-8)}</h3>
                           <p className="text-gray-600">Customer: {order.user?.name}</p>
+                          <p className="text-gray-600">Email: {order.user?.email}</p>
+                          <p className="text-gray-600">Phone: {order.user?.phone}</p>
+                          <p className="text-gray-600">Address: {order.user?.address}</p>
+                          <p className="text-gray-600">Gstin: {order.user?.gstin}</p>
                           <p className="text-gray-600">Date: {new Date(order.createdAt).toLocaleDateString()}</p>
                           <p className="text-gray-600">Location: {order.location}</p>
                         </div>
+                        <div>
+                          <p className="font-medium mb-2">Order Items</p>
+                          <div className="space-y-2">
+                            {order?.items?.map((item, index) => (
+                              <div key={index} className="flex justify-between items-center text-sm">
+                                <span className="truncate pr-2">
+                                {item.product.name} × {item.quantity}
+                                </span>
+                                <span className="font-medium flex-shrink-0">₹{item.total}</span>
+                              </div>
+                              ))}
+                          </div>
+                        </div>        
                         <div className="text-right">
                           <p className="font-semibold">₹{order.total.toFixed(2)}</p>
                           <span
@@ -556,9 +573,26 @@ const AdminDashboard = () => {
                             <h3 className="font-semibold">Order #{order._id.slice(-8)}</h3>
                             <p className="text-gray-600">Customer: {order.user?.name}</p>
                             <p className="text-gray-600">Email: {order.user?.email}</p>
+                            <p className="text-gray-600">Phone: {order.user?.phone}</p>
+                            <p className="text-gray-600">Address: {order.user?.address}</p>
+                            <p className="text-gray-600">Gstin: {order.user?.gstin}</p>
                             <p className="text-gray-600">Date: {new Date(order.createdAt).toLocaleDateString()}</p>
                             <p className="text-gray-600">Location: {order.location}</p>
+                            <p className="text-gray-600">Notes: {order.notes}</p>
                           </div>
+                      <div>
+                        <p className="font-medium mb-2">Order Items</p>
+                        <div className="space-y-2">
+                          {order?.items?.map((item, index) => (
+                            <div key={index} className="flex justify-between items-center text-sm">
+                              <span className="truncate pr-2">
+                                {item.product.name} × {item.quantity}
+                              </span>
+                              <span className="font-medium flex-shrink-0">₹{item.total}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>  
                           <div className="text-right">
                             <p className="font-semibold">₹{order.total.toFixed(2)}</p>
                             {/* <select
