@@ -241,6 +241,9 @@ router.get("/profile", auth, async (req, res) => {
     profile.address = user.address;
     profile.location = user.location;
     profile.gstin = user.gstin;
+    profile.businessName = user.businessName;
+    profile.businessType = user.businessType;
+    profile.licenseNumber = user.licenseNumber;
     profile.isEmailVerified = user.isEmailVerified;
     profile.joined = user.createdAt;
     return res.json({ profile: profile });
@@ -404,6 +407,7 @@ router.put("/profile", auth, async (req, res) => {
       if (businessType !== undefined) user.businessType = businessType;
       if (licenseNumber !== undefined) user.licenseNumber = licenseNumber;
       if (gstin !== undefined) user.gstin = gstin;
+      await user.save();
     }
     await user.save();
     console.log(user);
