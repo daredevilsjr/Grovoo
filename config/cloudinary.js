@@ -13,7 +13,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "freshmart-products",
+    folder: "1StopMandi-products",
     allowed_formats: ["jpg", "jpeg", "png", "webp"],
     transformation: [
       {

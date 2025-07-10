@@ -17,7 +17,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [selectedLocation, setSelectedLocation] = useState("mumbai")
+  const [selectedLocation, setSelectedLocation] = useState("patna")
 
   useEffect(() => {
     const token = localStorage.getItem("token")

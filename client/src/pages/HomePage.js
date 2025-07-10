@@ -256,7 +256,7 @@ const HomePage = () => {
             <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
               Why Choose{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                FreshMart?
+                1StopMandi?
               </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -302,7 +302,7 @@ const HomePage = () => {
           </h2>
           <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-gray-700">
             Join thousands of restaurants who trust{" "}
-            <span className="font-semibold text-indigo-600">FreshMart</span> for
+            <span className="font-semibold text-indigo-600">1StopMandi</span> for
             their daily ingredient needs.
           </p>
 

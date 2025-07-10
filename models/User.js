@@ -43,8 +43,8 @@ const userSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      enum: ["mumbai", "delhi", "bangalore"],
-      default: "mumbai",
+      enum: ["patna"],
+      default: "patna",
     },
     isActive: {
       type: Boolean,

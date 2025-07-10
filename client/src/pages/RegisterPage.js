@@ -15,7 +15,7 @@ const RegisterPage = () => {
     gstin: "",
     phone: "",
     address: "",
-    location: "mumbai",
+    location: "patna",
   })
   const [loading, setLoading] = useState(false)
   const { register, isAuthenticated } = useAuthStore()
@@ -70,7 +70,7 @@ const RegisterPage = () => {
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
-          <p className="text-gray-600 mt-2">Join FreshMart today</p>
+          <p className="text-gray-600 mt-2">Join 1StopMandi today</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -121,9 +121,9 @@ const RegisterPage = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="mumbai">Mumbai</option>
-              <option value="delhi">Delhi</option>
-              <option value="bangalore">Bangalore</option>
+              <option value="patna">patna</option>
+              {/* <option value="delhi">Delhi</option>
+              <option value="bangalore">Bangalore</option> */}
             </select>
           </div>
 

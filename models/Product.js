@@ -35,7 +35,7 @@ const productSchema = new mongoose.Schema(
       min: 0,
     },
     price: {
-      mumbai: {
+      patna: {
         type: Number,
         required: true,
         min: 0,

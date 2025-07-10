@@ -182,7 +182,7 @@ const OrderConfirmationPage = () => {
               </span>
               <span className="text-blue-600">
                 <i className="fas fa-envelope mr-1"></i>
-                support@freshmart.com
+                support@1StopMandi.com
               </span>
             </div>
           </div>

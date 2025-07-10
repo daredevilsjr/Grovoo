@@ -13,7 +13,7 @@ const Footer = () => {
           <div className="md:col-span-1">
             <div className="flex items-center mb-4">
               <i className="fas fa-store text-2xl text-blue-400 mr-2"></i>
-              <span className="text-xl font-bold">FreshMart</span>
+              <span className="text-xl font-bold">1StopMandi</span>
             </div>
             <p className="text-gray-300 mb-4">
               Your trusted B2B food supply partner. Fresh ingredients delivered to restaurants and hotels across India.
@@ -106,7 +106,7 @@ const Footer = () => {
                 <i className="fas fa-map-marker-alt text-blue-400 mt-1 mr-3"></i>
                 <div>
                   <p className="text-gray-300">123 Business Park</p>
-                  <p className="text-gray-300">Mumbai, Maharashtra 400001</p>
+                  <p className="text-gray-300">patna, Maharashtra 400001</p>
                 </div>
               </div>
               <div className="flex items-center">
@@ -117,8 +117,8 @@ const Footer = () => {
               </div>
               <div className="flex items-center">
                 <i className="fas fa-envelope text-blue-400 mr-3"></i>
-                <a href="mailto:support@freshmart.com" className="text-gray-300 hover:text-white transition-colors">
-                  support@freshmart.com
+                <a href="mailto:support@1StopMandi.com" className="text-gray-300 hover:text-white transition-colors">
+                  support@1StopMandi.com
                 </a>
               </div>
               <div className="flex items-center">
@@ -133,7 +133,7 @@ const Footer = () => {
         {/* <div className="border-t border-gray-700 mt-8 pt-8">
           <h3 className="text-lg font-semibold mb-4 text-center">We Deliver To</h3>
           <div className="flex flex-wrap justify-center gap-4">
-            <span className="bg-gray-800 px-4 py-2 rounded-full text-sm">Mumbai</span>
+            <span className="bg-gray-800 px-4 py-2 rounded-full text-sm">patna</span>
             <span className="bg-gray-800 px-4 py-2 rounded-full text-sm">Delhi</span>
             <span className="bg-gray-800 px-4 py-2 rounded-full text-sm">Bangalore</span>
             <span className="bg-gray-800 px-4 py-2 rounded-full text-sm">Pune</span>
@@ -162,7 +162,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <div className="text-gray-400 text-sm mb-4 md:mb-0">© {currentYear} FreshMart. All rights reserved.</div>
+          <div className="text-gray-400 text-sm mb-4 md:mb-0">© {currentYear} 1StopMandi. All rights reserved.</div>
           <div className="flex space-x-6 text-sm">
             <a href="#" className="text-gray-400 hover:text-white transition-colors">
               Privacy Policy

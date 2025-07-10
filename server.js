@@ -19,7 +19,7 @@ app.use("/uploads", express.static("uploads"))
 
 // MongoDB Connection
 mongoose
-  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/freshmart", {})
+  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/1StopMandi", {})
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log("MongoDB connection error:", err))
 

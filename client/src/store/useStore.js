@@ -9,7 +9,7 @@ export const useAuthStore = create(
     (set, get) => ({
       user: null,
       token: null,
-      selectedLocation: "mumbai",
+      selectedLocation: "patna",
       loading: true,
       isAuthenticated: false,
 

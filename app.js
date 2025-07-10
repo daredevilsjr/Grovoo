@@ -7,92 +7,13 @@ const { useState, useEffect, useContext, createContext } = React
 // Context for global state management
 const AppContext = createContext()
 
-// Mock data for development
-const mockProducts = [
-  {
-    id: 1,
-    name: "Fresh Tomatoes",
-    category: "Vegetables",
-    price: { mumbai: 45, delhi: 42, bangalore: 48 },
-    image: "/placeholder.svg?height=200&width=200",
-    description: "Fresh red tomatoes, perfect for cooking",
-    stock: 100,
-    unit: "kg",
-  },
-  {
-    id: 2,
-    name: "Basmati Rice",
-    category: "Grains",
-    price: { mumbai: 120, delhi: 115, bangalore: 125 },
-    image: "/placeholder.svg?height=200&width=200",
-    description: "Premium quality basmati rice",
-    stock: 50,
-    unit: "kg",
-  },
-  {
-    id: 3,
-    name: "Chicken Breast",
-    category: "Non-Veg",
-    price: { mumbai: 280, delhi: 275, bangalore: 285 },
-    image: "/placeholder.svg?height=200&width=200",
-    description: "Fresh chicken breast, boneless",
-    stock: 25,
-    unit: "kg",
-  },
-  {
-    id: 4,
-    name: "Olive Oil",
-    category: "Oils",
-    price: { mumbai: 450, delhi: 440, bangalore: 460 },
-    image: "/placeholder.svg?height=200&width=200",
-    description: "Extra virgin olive oil",
-    stock: 30,
-    unit: "liter",
-  },
-  {
-    id: 5,
-    name: "Fresh Milk",
-    category: "Dairy",
-    price: { mumbai: 55, delhi: 52, bangalore: 58 },
-    image: "/placeholder.svg?height=200&width=200",
-    description: "Fresh cow milk",
-    stock: 80,
-    unit: "liter",
-  },
-  {
-    id: 6,
-    name: "Turmeric Powder",
-    category: "Spices",
-    price: { mumbai: 180, delhi: 175, bangalore: 185 },
-    image: "/placeholder.svg?height=200&width=200",
-    description: "Pure turmeric powder",
-    stock: 40,
-    unit: "kg",
-  },
-]
-
-const mockOrders = [
-  {
-    id: 1,
-    userId: 1,
-    items: [
-      { productId: 1, quantity: 5, price: 45 },
-      { productId: 2, quantity: 2, price: 120 },
-    ],
-    total: 465,
-    status: "delivered",
-    date: "2024-01-15",
-    location: "mumbai",
-  },
-]
-
 // App Context Provider
 function AppProvider({ children }) {
   const [user, setUser] = useState(null)
   const [products, setProducts] = useState(mockProducts)
   const [cart, setCart] = useState([])
   const [orders, setOrders] = useState(mockOrders)
-  const [selectedLocation, setSelectedLocation] = useState("mumbai")
+  const [selectedLocation, setSelectedLocation] = useState("patna")
   const [currentPage, setCurrentPage] = useState("home")
 
   // Load user from localStorage on app start
@@ -194,9 +115,7 @@ function Header() {
   const { user, logout, currentPage, setCurrentPage, cart, selectedLocation, setSelectedLocation } = useApp()
 
   const locations = [
-    { value: "mumbai", label: "Mumbai" },
-    { value: "delhi", label: "Delhi" },
-    { value: "bangalore", label: "Bangalore" },
+    { value: "patna", label: "patna" },
   ]
 
   const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0)
@@ -208,7 +127,7 @@ function Header() {
           {/* Logo */}
           <div className="flex items-center cursor-pointer" onClick={() => setCurrentPage("home")}>
             <i className="fas fa-store text-2xl text-blue-600 mr-2"></i>
-            <span className="text-xl font-bold text-gray-800">FreshMart</span>
+            <span className="text-xl font-bold text-gray-800">1StopMandi</span>
           </div>
 
           {/* Location Selector */}
@@ -376,7 +295,7 @@ function HomePage() {
       {/* Features Section */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose FreshMart?</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Why Choose 1StopMandi?</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -430,9 +349,9 @@ function LoginPage() {
         // Mock login - in real app, validate against backend
         const userData = {
           id: 1,
-          name: formData.email === "admin@freshmart.com" ? "Admin User" : "Hotel User",
+          name: formData.email === "admin@1StopMandi.com" ? "Admin User" : "Hotel User",
           email: formData.email,
-          role: formData.email === "admin@freshmart.com" ? "admin" : "hotel",
+          role: formData.email === "admin@1StopMandi.com" ? "admin" : "hotel",
         }
         login(userData)
         setCurrentPage("home")
@@ -463,7 +382,7 @@ function LoginPage() {
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">{isLogin ? "Sign In" : "Create Account"}</h2>
-          <p className="text-gray-600 mt-2">{isLogin ? "Welcome back to FreshMart" : "Join FreshMart today"}</p>
+          <p className="text-gray-600 mt-2">{isLogin ? "Welcome back to 1StopMandi" : "Join 1StopMandi today"}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -505,7 +424,7 @@ function LoginPage() {
               value={formData.email}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="admin@freshmart.com for admin access"
+              placeholder="admin@1StopMandi.com for admin access"
             />
           </div>
 
@@ -567,7 +486,7 @@ function LoginPage() {
             <p className="text-sm text-blue-800">
               <strong>Demo Credentials:</strong>
               <br />
-              Admin: admin@freshmart.com
+              Admin: admin@1StopMandi.com
               <br />
               Hotel: any other email
             </p>
@@ -957,7 +876,7 @@ function AdminDashboard() {
     description: "",
     stock: 0,
     unit: "kg",
-    price: { mumbai: 0, delhi: 0, bangalore: 0 },
+    price: { patna: 0 },
   })
 
   const handleAddProduct = (e) => {
@@ -974,7 +893,7 @@ function AdminDashboard() {
       description: "",
       stock: 0,
       unit: "kg",
-      price: { mumbai: 0, delhi: 0, bangalore: 0 },
+      price: { patna: 0 },
     })
     setShowAddProduct(false)
     alert("Product added successfully!")
@@ -1086,7 +1005,7 @@ function AdminDashboard() {
                           Stock
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Price (Mumbai)
+                          Price (patna)
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Actions
@@ -1112,7 +1031,7 @@ function AdminDashboard() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {product.stock} {product.unit}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{product.price.mumbai}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{product.price.patna}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <button className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
                             <button
@@ -1230,22 +1149,22 @@ function AdminDashboard() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Prices by City</label>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="text-xs text-gray-600">Mumbai</label>
+                    <label className="text-xs text-gray-600">patna</label>
                     <input
                       type="number"
                       required
-                      value={newProduct.price.mumbai}
+                      value={newProduct.price.patna}
                       onChange={(e) =>
                         setNewProduct({
                           ...newProduct,
-                          price: { ...newProduct.price, mumbai: Number.parseFloat(e.target.value) },
+                          price: { ...newProduct.price, patna: Number.parseFloat(e.target.value) },
                         })
                       }
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
-                  <div>
-                    <label className="text-xs text-gray-600">Delhi</label>
+                  {/* <div>
+                    <label className="text-xs text-gray-600">delhi</label>
                     <input
                       type="number"
                       required
@@ -1258,8 +1177,8 @@ function AdminDashboard() {
                       }
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
-                  </div>
-                  <div>
+                  </div> */}
+                  {/* <div>
                     <label className="text-xs text-gray-600">Bangalore</label>
                     <input
                       type="number"
@@ -1273,7 +1192,7 @@ function AdminDashboard() {
                       }
                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="flex space-x-3 pt-4">
@@ -1401,11 +1320,11 @@ function ContactPage() {
                   </div>
                   <div className="flex items-center">
                     <i className="fas fa-envelope text-blue-600 w-6"></i>
-                    <span className="ml-3">support@freshmart.com</span>
+                    <span className="ml-3">support@1StopMandi.com</span>
                   </div>
                   <div className="flex items-center">
                     <i className="fas fa-map-marker-alt text-blue-600 w-6"></i>
-                    <span className="ml-3">123 Business Park, Mumbai, India</span>
+                    <span className="ml-3">123 Business Park, patna, India</span>
                   </div>
                   <div className="flex items-center">
                     <i className="fas fa-clock text-blue-600 w-6"></i>

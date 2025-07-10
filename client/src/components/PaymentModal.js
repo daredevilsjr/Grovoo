@@ -42,7 +42,7 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
         key,
         amount,
         currency,
-        name: "FreshMart",
+        name: "1StopMandi",
         description: `Order for ${getCartItemsCount()} items`,
         order_id: orderId,
         handler: async (response) => {

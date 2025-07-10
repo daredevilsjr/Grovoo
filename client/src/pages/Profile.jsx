@@ -38,10 +38,10 @@
 
 //   const [profileData, setProfileData] = useState({
 //     name: "Abhinav Singh",
-//     email: "abhisar@freshmart.com",
+//     email: "abhisar@1StopMandi.com",
 //     phone: "+91 98765 43210",
 //     role: "hotel",
-//     address: "123 Business District, Mumbai, Maharashtra 400001",
+//     address: "123 Business District, patna, Maharashtra 400001",
 //     businessName: "Singh's Restaurant",
 //     gstin: "27ABCDE1234F1Z5",
 //     licenseNumber: "FSSAI-12345678901234",
@@ -891,10 +891,10 @@ export default function Profile() {
 
   const [profileData, setProfileData] = useState({
     name: "Abhinav Singh",
-    email: "abhisar@freshmart.com",
+    email: "abhisar@1StopMandi.com",
     phone: "+91 98765 43210",
     role: "hotel",
-    address: "123 Business District, Mumbai, Maharashtra 400001",
+    address: "123 Business District, patna, Maharashtra 400001",
     businessName: "Singh's Restaurant",
     gstin: "27ABCDE1234F1Z5",
     licenseNumber: "FSSAI-12345678901234",

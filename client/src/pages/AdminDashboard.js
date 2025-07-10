@@ -17,7 +17,7 @@ const AdminDashboard = () => {
     description: "",
     stock: 0,
     unit: "kg",
-    price: { mumbai: 0, delhi: 0, bangalore: 0 },
+    price: { patna: 0 },
     image: "",
     imagePublicId: "",
   })
@@ -147,7 +147,7 @@ const AdminDashboard = () => {
       description: "",
       stock: 0,
       unit: "kg",
-      price: { mumbai: 0, delhi: 0, bangalore: 0 },
+      price: { patna: 0},
       image: "",
       imagePublicId: "",
     })
@@ -525,7 +525,7 @@ const AdminDashboard = () => {
                           </div>
                           <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
                           <div className="flex justify-between items-center mb-3">
-                            <span className="text-lg font-bold text-green-600">₹{product.price.mumbai}</span>
+                            <span className="text-lg font-bold text-green-600">₹{product.price.patna}</span>
                             <span className={`text-sm ${product.stock > 10 ? "text-green-600" : "text-red-600"}`}>
                               {product.stock} {product.unit}
                             </span>
@@ -863,24 +863,24 @@ const AdminDashboard = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Prices by City *</label>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <label className="text-xs text-gray-600 mb-1 block">Mumbai (₹)</label>
+                      <label className="text-xs text-gray-600 mb-1 block">patna (₹)</label>
                       <input
                         type="number"
                         required
                         min="0"
                         step="0.01"
-                        value={newProduct.price.mumbai}
+                        value={newProduct.price.patna}
                         onChange={(e) =>
                           setNewProduct({
                             ...newProduct,
-                            price: { ...newProduct.price, mumbai: Number.parseFloat(e.target.value) },
+                            price: { ...newProduct.price, patna: Number.parseFloat(e.target.value) },
                           })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="0.00"
                       />
                     </div>
-                    <div>
+                    {/* <div>
                       <label className="text-xs text-gray-600 mb-1 block">Delhi (₹)</label>
                       <input
                         type="number"
@@ -915,7 +915,7 @@ const AdminDashboard = () => {
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="0.00"
                       />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 

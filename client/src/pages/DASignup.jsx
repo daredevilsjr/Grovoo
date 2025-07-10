@@ -257,9 +257,9 @@ export default function DeliveryAgentSignup() {
                     }`}
                 >
                   <option value="">Select your service location</option>
-                  <option value="mumbai">Mumbai</option>
-                  <option value="delhi">Delhi</option>
-                  <option value="bangalore">Bangalore</option>
+                  <option value="patna">patna</option>
+                  {/* <option value="delhi">Delhi</option>
+                  <option value="bangalore">Bangalore</option> */}
                 </select>
                 {errors.location && <p className="text-sm text-red-500">{errors.location}</p>}
               </div>

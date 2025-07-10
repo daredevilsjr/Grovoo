@@ -62,7 +62,7 @@ const LoginPage = () => {
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Sign In</h2>
-          <p className="text-gray-600 mt-2">Welcome back to FreshMart</p>
+          <p className="text-gray-600 mt-2">Welcome back to 1StopMandi</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -131,16 +131,6 @@ const LoginPage = () => {
           <Link to="/register" className="text-blue-600 hover:text-blue-800">
             Don't have an account? Sign up
           </Link>
-        </div>
-
-        <div className="mt-4 p-4 bg-blue-50 rounded-md">
-          <p className="text-sm text-blue-800">
-            <strong>Demo Credentials:</strong>
-            <br />
-            Admin: admin@freshmart.com / password123
-            <br />
-            Hotel: hotel@test.com / password123
-          </p>
         </div>
       </div>
     </div>

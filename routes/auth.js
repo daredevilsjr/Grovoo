@@ -30,7 +30,7 @@ router.post("/register", async (req, res) => {
       phone,
       gstin,
       address,
-      location: location || "mumbai",
+      location: location || "patna",
     });
 
     await user.save();

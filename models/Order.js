@@ -77,7 +77,7 @@ const orderSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      enum: ["mumbai", "delhi", "bangalore"],
+      enum: ["patna"],
       required: true,
     },
     deliveryAddress: {

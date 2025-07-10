@@ -14,9 +14,9 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
 
   const locations = [
-    { value: "mumbai", label: "Mumbai", icon: "🏙️" },
-    { value: "delhi", label: "Delhi", icon: "🏛️" },
-    { value: "bangalore", label: "Bangalore", icon: "🌆" },
+    { value: "patna", label: "patna", icon: "🏙️" },
+    // { value: "delhi", label: "Delhi", icon: "🏛️" },
+    // { value: "bangalore", label: "Bangalore", icon: "🌆" },
   ]
 
   // Handle scroll effect
@@ -77,7 +77,7 @@ const Header = () => {
               <i className="fas fa-store text-white text-lg"></i>
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              FreshMart
+              1StopMandi
             </span>
           </Link>
 

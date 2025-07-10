@@ -111,11 +111,11 @@ const ContactPage = () => {
                   </div>
                   <div className="flex items-center">
                     <i className="fas fa-envelope text-blue-600 w-6"></i>
-                    <span className="ml-3">support@freshmart.com</span>
+                    <span className="ml-3">support@1StopMandi.com</span>
                   </div>
                   <div className="flex items-center">
                     <i className="fas fa-map-marker-alt text-blue-600 w-6"></i>
-                    <span className="ml-3">123 Business Park, Mumbai, India</span>
+                    <span className="ml-3">123 Business Park, patna, India</span>
                   </div>
                   <div className="flex items-center">
                     <i className="fas fa-clock text-blue-600 w-6"></i>

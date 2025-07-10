@@ -405,9 +405,9 @@ export default function DeliveryAgentProfile() {
                     onChange={(e) => handleSelectChange("location", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-                    <option value="mumbai">Mumbai</option>
-                    <option value="delhi">Delhi</option>
-                    <option value="bangalore">Bangalore</option>
+                    <option value="patna">patna</option>
+                    {/* <option value="delhi">Delhi</option>
+                    <option value="bangalore">Bangalore</option> */}
                   </select>
                 ) : (
                   <input
