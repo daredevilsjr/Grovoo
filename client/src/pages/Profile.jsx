@@ -1720,7 +1720,7 @@ export default function Profile() {
                           disabled={!isEditing}
                           className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 transform hover:scale-105 ${(isEditing ? editData[key] : profileData[key])
                             ? "bg-gradient-to-r from-purple-500 to-indigo-600 shadow-lg shadow-purple-200"
-                            : "bg-gray-300 hover:bg-gray-400"
+                            : "bg-gradient-to-r from-purple-500 to-indigo-600 shadow-lg shadow-purple-200"
                             } ${!isEditing ? "opacity-50 cursor-not-allowed hover:scale-100" : "cursor-pointer"}`}
                         >
                           <span
