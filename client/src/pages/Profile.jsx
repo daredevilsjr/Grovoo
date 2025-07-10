@@ -913,7 +913,7 @@ export default function Profile() {
     emailNotifications: true,
     smsNotifications: true,
     orderUpdates: true,
-    marketingEmails: false,
+    marketingEmails: true,
   })
 
   const [editData, setEditData] = useState({ ...profileData })
@@ -1255,6 +1255,11 @@ export default function Profile() {
                     label="Member Since"
                     value={new Date(profileData?.joined).toLocaleDateString()}
                   />
+                  <InfoCard
+                    icon={MapPin}
+                    label="location"
+                    value={profileData?.location}
+                  />
                 </div>
               </div>
             </div>
@@ -1292,30 +1297,34 @@ export default function Profile() {
                     />
                   </div>
 
-                  <div className="space-y-3 group">
+                  {!isEditing && (<div className="space-y-3 group">
                     <label className="text-sm font-semibold text-gray-700 flex items-center">
                       <Shield className="w-4 h-4 mr-2 text-purple-600" />
                       Role
                     </label>
-                    {isEditing ? (
-                      <select
-                        name="role"
-                        value={editData.role}
-                        disabled
-                        className="w-full h-11 px-3 border border-gray-300 rounded-lg bg-white hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
-                      >
-                        <option value="admin">Admin</option>
-                        <option value="hotel">Hotel/Restaurant</option>
-                        <option value="delivery">Delivery Agent</option>
-                      </select>
-                    ) : (
+                    <input
+                      value={getDisplayValue("role", profileData.role)}
+                      disabled
+                      className="w-full h-11 px-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
+                    />
+                  </div>)}
+                  {isEditing && (
+                    <div className="space-y-3 group">
+                      <label className="text-sm font-semibold text-gray-700 flex items-center">
+                        <MapPin className="w-4 h-4 mr-2 text-purple-600" />
+                        Location
+                      </label>
                       <input
-                        value={getDisplayValue("role", profileData.role)}
-                        disabled
-                        className="w-full h-11 px-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
+                        type="location"
+                        name="location"
+                        value={isEditing ? editData.location : profileData.location}
+                        disabled={!isEditing}
+                        className={`w-full h-11 px-3 border rounded-lg transition-all duration-200 ${!isEditing
+                          ? "bg-gray-50 border-gray-200 text-gray-500"
+                          : "bg-white border-gray-300 hover:border-gray-400 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-100"
+                          }`}
                       />
-                    )}
-                  </div>
+                    </div>)}
 
                   <div className="space-y-3 group">
                     <div className="flex items-center justify-between">
@@ -1448,7 +1457,7 @@ export default function Profile() {
                 </h2>
               </div>
               <div className="p-8 space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {profileData?.role === "hotel" && (<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3 group">
                     <label className="text-sm font-semibold text-gray-700 flex items-center">
                       <Building className="w-4 h-4 mr-2 text-purple-600" />
@@ -1520,7 +1529,7 @@ export default function Profile() {
                         }`}
                     />
                   </div>
-                </div>
+                </div>)}
 
                 {profileData?.role === "delivery" && (
                   <div className="pt-6 border-t border-gray-200 animate-in slide-in-from-bottom-2">
@@ -1715,9 +1724,9 @@ export default function Profile() {
                             } ${!isEditing ? "opacity-50 cursor-not-allowed hover:scale-100" : "cursor-pointer"}`}
                         >
                           <span
-                            className={`inline-block h-5 w-5 transform rounded-full bg-white transition-all duration-300 shadow-lg ${(isEditing ? editData[key] : profileData[key])
+                            className={`inline-block h-5 w-5 transform rounded-full bg-white transition-all duration-300 shadow-lg ${(isEditing ? true : true)
                               ? "translate-x-6 shadow-purple-200"
-                              : "translate-x-1"
+                              : "translate-x-6 shadow-purple-200"
                               }`}
                           />
                         </button>
