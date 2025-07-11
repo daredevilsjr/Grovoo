@@ -1320,7 +1320,7 @@ function ContactPage() {
                   </div>
                   <div className="flex items-center">
                     <i className="fas fa-envelope text-blue-600 w-6"></i>
-                    <span className="ml-3">support@1StopMandi.com</span>
+                    <span className="ml-3">support@1stopmandi.com</span>
                   </div>
                   <div className="flex items-center">
                     <i className="fas fa-map-marker-alt text-blue-600 w-6"></i>

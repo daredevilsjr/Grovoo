@@ -19,18 +19,21 @@ const Footer = () => {
               Your trusted B2B food supply partner. Fresh ingredients delivered to restaurants and hotels across India.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <a href="#" target="_blank" className="text-gray-400 hover:text-blue-400 transition-colors">
                 <i className="fab fa-facebook-f text-xl"></i>
               </a>
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <a href="https://x.com/1StopMandi" target="_blank" className="text-gray-400 hover:text-blue-400 transition-colors">
                 <i className="fab fa-twitter text-xl"></i>
               </a>
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <a href="https://www.instagram.com/1stopmandi_official?igsh=aDNzZ3A3dHIxeHFx" target="_blank" className="text-gray-400 hover:text-blue-400 transition-colors">
                 <i className="fab fa-instagram text-xl"></i>
               </a>
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <a href="https://www.linkedin.com/company/1stopmandi/" target="_blank" className="text-gray-400 hover:text-blue-400 transition-colors">
                 <i className="fab fa-linkedin-in text-xl"></i>
               </a>
+              <a href="https://www.youtube.com/channel/UCQNEkDksi8b3ytbf3E6fXVw" target="_blank" className="text-gray-400 hover:text-blue-400 transition-colors">
+                <i className="fab fa-youtube text-xl"></i>
+              </a>              
             </div>
           </div>
 
@@ -105,20 +108,20 @@ const Footer = () => {
               <div className="flex items-start">
                 <i className="fas fa-map-marker-alt text-blue-400 mt-1 mr-3"></i>
                 <div>
-                  <p className="text-gray-300">123 Business Park</p>
-                  <p className="text-gray-300">patna, Maharashtra 400001</p>
+                  <p className="text-gray-300">Boring Road, Shri Krishna Puri</p>
+                  <p className="text-gray-300">Patna, Bihar 800001</p>
                 </div>
               </div>
               <div className="flex items-center">
                 <i className="fas fa-phone text-blue-400 mr-3"></i>
-                <a href="tel:+919876543210" className="text-gray-300 hover:text-white transition-colors">
-                  +91 98765 43210
+                <a href="tel:+917292980098" className="text-gray-300 hover:text-white transition-colors">
+                  +91 72929 80098
                 </a>
               </div>
               <div className="flex items-center">
                 <i className="fas fa-envelope text-blue-400 mr-3"></i>
-                <a href="mailto:support@1StopMandi.com" className="text-gray-300 hover:text-white transition-colors">
-                  support@1StopMandi.com
+                <a href="mailto:support@1stopmandi.com" className="text-gray-300 hover:text-white transition-colors">
+                  support@1stopmandi.com
                 </a>
               </div>
               <div className="flex items-center">

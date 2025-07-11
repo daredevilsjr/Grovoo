@@ -82,7 +82,7 @@ const HomePage = () => {
       icon: "fas fa-truck",
       title: "Lightning Fast Delivery",
       description:
-        "Get your orders delivered within 24 hours across major cities with real-time tracking.",
+        "Get your orders delivered within 12 hours across major cities with real-time tracking.",
       color: "from-blue-500 to-blue-600",
       bgColor: "bg-gradient-to-br from-blue-50 to-blue-100",
     },
@@ -98,16 +98,16 @@ const HomePage = () => {
       icon: "fas fa-tags",
       title: "Wholesale Prices",
       description:
-        "Competitive wholesale prices for bulk orders with special discounts for regular customers.",
+        "Competitive wholesale prices for bulk orders with special discounted price for regular customers.",
       color: "from-purple-500 to-purple-600",
       bgColor: "bg-gradient-to-br from-purple-50 to-purple-100",
     },
   ];
 
   const stats = [
-    { number: "10,000+", label: "Happy Customers", icon: "fas fa-users" },
+    { number: "100+", label: "Happy Customers", icon: "fas fa-users" },
     { number: "500+", label: "Products", icon: "fas fa-box" },
-    { number: "50+", label: "Cities", icon: "fas fa-map-marker-alt" },
+    { number: "5+", label: "Cities", icon: "fas fa-map-marker-alt" },
     { number: "99.9%", label: "Uptime", icon: "fas fa-clock" },
   ];
 
@@ -132,21 +132,21 @@ const HomePage = () => {
             <div className="inline-flex items-center bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-6 py-2 mb-8 animate-slide-up">
               <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
               <span className="text-sm font-medium">
-                Trusted by 10,000+ Restaurants
+                Trusted by 100+ Restaurants
               </span>
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
               Fresh Ingredients for Your
               <span className="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                Restaurant
+                Restaurant & Outlet
               </span>
             </h1>
 
             <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto leading-relaxed opacity-90">
               Get premium quality ingredients delivered fresh to your doorstep.
               <span className="block mt-2 font-semibold">
-                Trusted by thousands of restaurants across India.
+                Officially Funded by Bihar Government's Startup Initiative
               </span>
             </p>
 
@@ -301,7 +301,7 @@ const HomePage = () => {
             Ready to Transform Your Kitchen?
           </h2>
           <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-gray-700">
-            Join thousands of restaurants who trust{" "}
+            Join hundreds of restaurants who trust{" "}
             <span className="font-semibold text-indigo-600">1StopMandi</span> for
             their daily ingredient needs.
           </p>

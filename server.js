@@ -19,7 +19,7 @@ app.use("/uploads", express.static("uploads"))
 
 // MongoDB Connection
 mongoose
-  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/1StopMandi", {})
+  .connect(process.env.MONGODB_URI , {})
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log("MongoDB connection error:", err))
 
@@ -36,6 +36,7 @@ app.use("/api/admin", require("./routes/admin"))
 app.use("/api/upload", require("./routes/upload"))
 app.use("/api/payment", require("./routes/payment"))
 app.use("/api/agent", require("./routes/agent"))
+app.use("/api/contact", require("./routes/contact"))
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "client/build")))

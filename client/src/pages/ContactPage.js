@@ -7,22 +7,41 @@ const ContactPage = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    mobile: "",
     subject: "",
     message: "",
   })
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+  e.preventDefault();
+  setLoading(true);
 
-    // Simulate form submission
-    setTimeout(() => {
-      toast.success("Thank you for your message! We will get back to you soon.")
-      setFormData({ name: "", email: "", subject: "", message: "" })
-      setLoading(false)
-    }, 1000)
+  try {
+    const res = await fetch("http://localhost:5000/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      toast.success("Thank you for your message! We will get back to you soon.");
+      setFormData({ name: "", email: "", subject: "", mobile: "", message: "" });
+    } else {
+      toast.error("Failed to send message. Please try again.");
+    }
+  } catch (error) {
+    toast.error("Server error. Please try again later.");
+    console.error("Contact form error:", error);
   }
+
+  setLoading(false);
+};
+
 
   const handleChange = (e) => {
     setFormData({
@@ -67,6 +86,18 @@ const ContactPage = () => {
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Mobile</label>
+                  <input
+                    type="tel"
+                    name="mobile"
+                    required
+                    value={formData.mobile}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Your mobile number"
+                  />
+                </div> 
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
                   <input
                     type="text"
@@ -107,15 +138,15 @@ const ContactPage = () => {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <i className="fas fa-phone text-blue-600 w-6"></i>
-                    <span className="ml-3">+91 98765 43210</span>
+                    <span className="ml-3">+91 7292980098</span>
                   </div>
                   <div className="flex items-center">
                     <i className="fas fa-envelope text-blue-600 w-6"></i>
-                    <span className="ml-3">support@1StopMandi.com</span>
+                    <span className="ml-3">support@1stopmandi.com</span>
                   </div>
                   <div className="flex items-center">
                     <i className="fas fa-map-marker-alt text-blue-600 w-6"></i>
-                    <span className="ml-3">123 Business Park, patna, India</span>
+                    <span className="ml-3">Boring Road, Shri Krishna Puri, Patna, Bihar 800001</span>
                   </div>
                   <div className="flex items-center">
                     <i className="fas fa-clock text-blue-600 w-6"></i>
@@ -134,13 +165,13 @@ const ContactPage = () => {
                   <div>
                     <h3 className="font-medium text-gray-800">What is the minimum order value?</h3>
                     <p className="text-gray-600 text-sm mt-1">
-                      Minimum order value is ₹500. Free delivery on orders above ₹1000.
+                      Kindly contact us before order.
                     </p>
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-800">Do you accept returns?</h3>
                     <p className="text-gray-600 text-sm mt-1">
-                      Yes, we accept returns within 24 hours for fresh products.
+                      Yes, we accept returns within 3 hours. No partial returns are allowed.
                     </p>
                   </div>
                   <div>
