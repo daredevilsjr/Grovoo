@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/useStore";
 import toast from "react-hot-toast";
-
+import { Eye, EyeOff } from 'lucide-react';
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -99,15 +99,24 @@ const LoginPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
-            <input
-              type="password"
-              name="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                placeholder="Confirm your password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
 
           <button
