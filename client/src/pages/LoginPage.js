@@ -15,7 +15,7 @@ const LoginPage = () => {
   const { login, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [showPassword, setShowPassword] = useState(false);
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
