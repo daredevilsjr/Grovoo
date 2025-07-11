@@ -7,8 +7,10 @@ import toast from "react-hot-toast"
 import { useUIStore } from "../store/useStore"
 import ImageUpload from "../components/ImageUpload"
 import { User, Phone, Mail, MapPin, Truck, CheckCircle, XCircle, Clock } from "lucide-react"
+import { useAuthStore } from "../store/useStore"
 
 const AdminDashboard = () => {
+  const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState("dashboard")
   const [editingProduct, setEditingProduct] = useState(null)
   const [newProduct, setNewProduct] = useState({
@@ -23,23 +25,31 @@ const AdminDashboard = () => {
   })
 
   const handleCancelOrder = async (orderId) => {
-    const response = await axios.patch(`/api/admin/orders/${orderId}/cancel`);
-    if (response.data.success) {
-      toast.success(`Order ${orderId} Cancelled.`)
-      queryClient.invalidateQueries("admin-orders")
-      return;
+    try {
+      const response = await axios.patch(`/api/admin/orders/${orderId}/cancel`);
+      if (response.data.success) {
+        toast.success(`Order ${orderId} Cancelled.`)
+        queryClient.invalidateQueries("admin-orders")
+        return;
+      }
     }
-    toast.error(`Some Error Occurred.`);
+    catch (err) {
+      console.log(err);
+      toast.error(`Some Error Occurred.`);
+    }
     return;
   }
   const handleConfirmOrder = async (orderId) => {
-    const response = await axios.patch(`/api/admin/orders/${orderId}/confirm`);
-    if (response.data.success) {
-      toast.success(`Order ${orderId} Confirmed.`)
-      queryClient.invalidateQueries("admin-orders")
-      return;
+    try {
+      const response = await axios.patch(`/api/admin/orders/${orderId}/confirm`);
+      if (response.data.success) {
+        toast.success(`Order ${orderId} Confirmed.`)
+        queryClient.invalidateQueries("admin-orders")
+        return;
+      }
+    } catch (err) {
+      toast.error(`Some Error Occurred.`);
     }
-    toast.error(`Some Error Occurred.`);
     return;
   }
 
@@ -147,7 +157,7 @@ const AdminDashboard = () => {
       description: "",
       stock: 0,
       unit: "kg",
-      price: { patna: 0},
+      price: { patna: 0 },
       image: "",
       imagePublicId: "",
     })
@@ -258,6 +268,28 @@ const AdminDashboard = () => {
     setIsModalOpen(false);
     setModalImage("");
   };
+  const [adminData, setAdminData] = useState([]);
+  const [isAdminLoading, setIsAdminLoading] = useState(false);
+
+  const getAdminData = async () => {
+    setIsAdminLoading(true);
+    try {
+      const response = await axios.get('/api/auth/admin-data');
+      if (response.data.success) {
+        setAdminData(response.data.adminData);
+        setIsAdminLoading(false);
+        return;
+      }
+    } catch (err) {
+      toast.error("Some error occurred");
+    } finally {
+      setIsAdminLoading(false);
+    }
+  }
+  const handleUpdateAdminStatus = async (id, status) => {
+    await axios.patch(`/api/auth/admin/${id}/status`, { status });
+    getAdminData();
+  }
 
 
   const handleUpdateAgentStatus = async (agentId, newStatus) => {
@@ -405,6 +437,18 @@ const AdminDashboard = () => {
               >
                 Delivery Agents
               </button>
+              <button
+                onClick={() => {
+                  getAdminData();
+                  setActiveTab("Admins");
+                }}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === "Admins"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
+              >
+                Admins
+              </button>
             </nav>
           </div>
 
@@ -432,13 +476,13 @@ const AdminDashboard = () => {
                             {order?.items?.map((item, index) => (
                               <div key={index} className="flex justify-between items-center text-sm">
                                 <span className="truncate pr-2">
-                                {item.product.name} × {item.quantity}
+                                  {item.product.name} × {item.quantity}
                                 </span>
                                 <span className="font-medium flex-shrink-0">₹{item.total}</span>
                               </div>
-                              ))}
+                            ))}
                           </div>
-                        </div>        
+                        </div>
                         <div className="text-right">
                           <p className="font-semibold">₹{order.total.toFixed(2)}</p>
                           <span
@@ -580,19 +624,19 @@ const AdminDashboard = () => {
                             <p className="text-gray-600">Location: {order.location}</p>
                             <p className="text-gray-600">Notes: {order.notes}</p>
                           </div>
-                      <div>
-                        <p className="font-medium mb-2">Order Items</p>
-                        <div className="space-y-2">
-                          {order?.items?.map((item, index) => (
-                            <div key={index} className="flex justify-between items-center text-sm">
-                              <span className="truncate pr-2">
-                                {item.product.name} × {item.quantity}
-                              </span>
-                              <span className="font-medium flex-shrink-0">₹{item.total}</span>
+                          <div>
+                            <p className="font-medium mb-2">Order Items</p>
+                            <div className="space-y-2">
+                              {order?.items?.map((item, index) => (
+                                <div key={index} className="flex justify-between items-center text-sm">
+                                  <span className="truncate pr-2">
+                                    {item.product.name} × {item.quantity}
+                                  </span>
+                                  <span className="font-medium flex-shrink-0">₹{item.total}</span>
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      </div>  
+                          </div>
                           <div className="text-right">
                             <p className="font-semibold">₹{order.total.toFixed(2)}</p>
                             {/* <select
@@ -759,6 +803,99 @@ const AdminDashboard = () => {
                             >
                               <XCircle className="h-4 w-4" />
                               Reject Agent
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {user?.role === "owner" && activeTab === "Admins" && (
+              <div>
+                <h2 className="text-xl font-semibold mb-6">Delivery Agent Management</h2>
+                {isAdminLoading ? (
+                  <div className="text-center py-8">
+                    <div className="loading-spinner mx-auto mb-4"></div>
+                    <p>Loading Admin data...</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {adminData?.map((admin) => (
+                      <div key={admin._id} className="border rounded-lg p-6 bg-white shadow-sm">
+                        <div className="flex flex-col lg:flex-row gap-6">
+                          {/* Agent Profile Section */}
+                          <div className="flex-1">
+                            <div className="flex items-start gap-4 mb-4">
+                              {/* <img
+                                src={agent.profileImage || "/placeholder.svg"}
+                                alt={`${agent.name} profile`}
+                                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                              /> */}
+                              <div className="flex-1">
+                                <div className="flex items-start mb-2">
+                                  <div>
+                                    <h3 className="font-semibold text-lg">Agent #{admin._id}</h3>
+                                    <p className="text-gray-800 font-medium">{admin.name}</p>
+                                  </div>
+                                  <div className="text-center pr-2 pl-2">
+                                    <div
+                                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(admin.adminVerificationStatus)}`}
+                                    >
+                                      {getStatusIcon(admin.adminVerificationStatus)}
+                                      {admin.adminVerificationStatus ? "Verified" : "Verifiaction Pending"}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                                  <div className="flex items-center gap-2">
+                                    <Mail className="h-4 w-4" />
+                                    <span>{admin.email}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Phone className="h-4 w-4" />
+                                    <span>{admin.phone}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <MapPin className="h-4 w-4" />
+                                    <span>{admin.location}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <User className="h-4 w-4" />
+                                    <span>Address: {admin.address}</span>
+                                  </div>
+                                </div>
+
+                                <div className="mt-3 text-sm text-gray-600">
+                                  <p>Joined: {new Date(admin.createdAt).toLocaleDateString('en-GB')}</p>
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        {!admin.adminVerificationStatus && (
+                          <div className="flex gap-3 mt-4 pt-4 border-t">
+                            <button
+                              onClick={() => handleUpdateAdminStatus(admin._id, true)}
+                              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                              disabled={updateAgentStatusLoading}
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                              Verify Admin
+                            </button>
+                            <button
+                              onClick={() => handleUpdateAdminStatus(admin._id, false)}
+                              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                              disabled={updateAgentStatusLoading}
+                            >
+                              <XCircle className="h-4 w-4" />
+                              Reject Admin
                             </button>
                           </div>
                         )}

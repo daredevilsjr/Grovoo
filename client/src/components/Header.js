@@ -191,7 +191,8 @@ const Header = () => {
                       </div>
 
                       <div className="py-2">
-                        {user.role === "admin" && (
+                        {(user.role === "admin" || user.role === "owner") && (
+
                           <Link
                             to="/admin"
                             className="flex items-center px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-blue-600 transition-all duration-300 group"

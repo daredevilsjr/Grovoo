@@ -84,7 +84,9 @@ router.post("/login", async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-
+    if (user.role === "admin" && !user.adminVerificationStatus) {
+      return res.status(403).json({ message: "Please wait to be verified" });
+    }
     // Generate JWT
     const token = jwt.sign(
       { userId: user._id },
@@ -255,6 +257,37 @@ router.get("/profile", auth, async (req, res) => {
       .json({ message: "Server error while fetching profile" });
   }
 });
+router.get('/admin-data', auth, async (req, res) => {
+  try {
+    const user = req.user;
+    if (user.role !== "owner") {
+      return res.status(403).json({ message: "unauthorized" });
+    }
+    const adminData = await User.find({ role: "admin" }).sort({ createdAt: -1 });
+    return res.status(200).json({ message: "Profile fetched successfully", adminData: adminData, success: true });
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Error" });
+  }
+})
+router.patch('/admin/:id/status', auth, async (req, res) => {
+  try {
+    const status = req.body;
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (status)
+      user.adminVerificationStatus = true;
+    else
+      user.adminVerificationStatus = false;
+    await user.save();
+    return res.status(200).json({ message: "updated", success: true });
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Error" });
+  }
+})
 
 function generateSecureString(length = 8) {
   const alphabet =

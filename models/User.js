@@ -50,6 +50,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    adminVerificationStatus:{
+      type: Boolean,
+      default: false,
+    },
     passwordResetToken: {
       type: String,
     },

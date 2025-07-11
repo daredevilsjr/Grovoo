@@ -53,7 +53,8 @@ const ProtectedRoute = ({
   }
 
   // Check if admin access is required but user is not admin
-  if (adminOnly && user.role !== "admin") {
+  if (adminOnly && (user.role !== "admin" && user.role !== "owner")) {
+    console.log(user.role);
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 text-center">
@@ -85,7 +86,7 @@ const RoleBasedProfile = ({ elements, userRole }) => {
   // console.log("Elements:", elements);
   return userRole === "delivery" ? (
     elements.DeliveryAgentProfile
-  ) : userRole === "admin" || userRole === "hotel" ? (
+  ) : (userRole !== "admin" || userRole !== "owner") || userRole === "hotel" ? (
     elements.Profile
   ) : (
     <Navigate to="/unauthorized" replace />
@@ -96,7 +97,7 @@ const RoleBasedOders = ({ elements, userRole }) => {
   // console.log("Elements:", elements);
   return userRole === "delivery" ? (
     elements.ActiveOders
-  ) : userRole === "admin" || userRole === "hotel" ? (
+  ) : (userRole !== "admin" || userRole !== "owner") || userRole === "hotel" ? (
     elements.OrdersPage
   ) : (
     <Navigate to="/unauthorized" replace />
