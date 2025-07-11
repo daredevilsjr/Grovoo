@@ -244,6 +244,7 @@ router.get("/profile", auth, async (req, res) => {
     profile.address = user.address;
     profile.location = user.location;
     profile.gstin = user.gstin;
+    profile.adminVerificationStatus = user.adminVerificationStatus;
     profile.businessName = user.businessName;
     profile.businessType = user.businessType;
     profile.licenseNumber = user.licenseNumber;

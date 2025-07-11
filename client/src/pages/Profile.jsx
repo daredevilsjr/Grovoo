@@ -1238,6 +1238,10 @@ export default function Profile() {
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                         Active
                       </Badge>
+                      {profileData.role === "admin" && (<Badge className="text-green-600 border-green-200 bg-green-50">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                        {profileData.adminVerificationStatus ? "Verified" : "Not Verified"}
+                      </Badge>)}
                     </div>
                   </div>
 
