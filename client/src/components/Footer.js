@@ -19,7 +19,7 @@ const Footer = () => {
               Your trusted B2B food supply partner. Fresh ingredients delivered to restaurants and hotels across India.
             </p>
             <div className="flex space-x-4">
-              <a href="#" target="_blank" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <a href="https://www.facebook.com/profile.php?id=61578055870742&mibextid=ZbWKwL" target="_blank" className="text-gray-400 hover:text-blue-400 transition-colors">
                 <i className="fab fa-facebook-f text-xl"></i>
               </a>
               <a href="https://x.com/1StopMandi" target="_blank" className="text-gray-400 hover:text-blue-400 transition-colors">
