@@ -59,7 +59,7 @@ const RegisterPage = () => {
     if (result.success) {
       toast.success("Registration successful!")
       const from = location.state?.from?.pathname || "/"
-      navigate(from, { replace: true })
+      navigate("/login", { replace: true })
     } else {
       toast.error(result.message)
     }

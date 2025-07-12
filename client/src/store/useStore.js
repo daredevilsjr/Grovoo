@@ -60,15 +60,15 @@ export const useAuthStore = create(
         try {
           set({ loading: true });
           const response = await axios.post("/api/auth/register", userData);
-          const { token, user } = response.data;
+          // const { token, user } = response.data;
 
           // Set token in axios headers
-          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+          // axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
           set({
-            user,
-            token,
-            isAuthenticated: true,
+            //   user,
+            //   token,
+            //   isAuthenticated: true,
             loading: false,
           });
 

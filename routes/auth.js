@@ -36,21 +36,15 @@ router.post("/register", async (req, res) => {
     await user.save();
 
     // Generate JWT
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET || "fallback_secret",
-      { expiresIn: "7d" }
-    );
+    // const token = jwt.sign(
+    //   { userId: user._id },
+    //   process.env.JWT_SECRET || "fallback_secret",
+    //   { expiresIn: "7d" }
+    // );
 
     res.status(201).json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        location: user.location,
-      },
+      message: "Successfully Registered",
+      success : true,
     });
   } catch (error) {
     console.error("Registration error:", error);
