@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Package, MapPin, Clock, DollarSign, User, Phone, CheckCircle } from "lucide-react"
+import { Package, MapPin, Clock, DollarSign, User, Phone, CheckCircle, X } from "lucide-react"
 import toast from "react-hot-toast"
 import axios from "axios"
 
@@ -25,6 +25,7 @@ export default function OrdersPage() {
     }
   }
   const [otp, setOtp] = useState("");
+  const [cancellationReason, setCancellationReason] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const handleMarkAsDelivered = async (orderId) => {
     setIsVerifying(true);
@@ -35,6 +36,20 @@ export default function OrdersPage() {
       if (response.data.success) {
         setRefetch(1);
         toast.success("Order marked as delivered successfully!")
+        return;
+      }
+      toast.error("Some error occured");
+    }
+    setIsVerifying(false);
+  }
+  const handleRequestCancellation = async (orderId) => {
+    setIsVerifying(true);
+    const orderToDeliver = acceptedOrders.find((order) => order._id === orderId)
+    if (orderToDeliver) {
+      const response = await axios.post(`/api/agent/${orderId}/request-cancel`, { message: cancellationReason });
+      if (response.data.success) {
+        setRefetch(1);
+        toast.success("Requested Order Cancellation")
         return;
       }
       toast.error("Some error occured");
@@ -223,27 +238,55 @@ export default function OrdersPage() {
           </button>
         )}
         {status === "accepted" && (
-          <>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Enter verification OTP sent to Cutomer
-            </label>
-            <input
-              type="text"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              disabled={isVerifying}
-              required
-              placeholder="Enter OTP Code"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
-            />
-            <button
-              onClick={() => handleMarkAsDelivered(order?._id)}
-              className="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center"
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Mark As Delivered
-            </button>
-          </>
+          <div>
+            {/* First row: OTP and Mark As Delivered */}
+            <div className="flex space-x-4 mb-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Enter verification OTP sent to Customer
+                </label>
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  disabled={isVerifying}
+                  required
+                  placeholder="Enter OTP Code"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                />
+              </div>
+              <button
+                onClick={() => handleMarkAsDelivered(order?._id)}
+                className="bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center"
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Mark As Delivered
+              </button>
+            </div>
+
+            {/* Second row: Request Cancellation and Cancellation Reason */}
+            <div className="flex space-x-4">
+              <button
+                onClick={() => handleRequestCancellation(order?._id)}
+                className="bg-red-600 text-white py-3 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors flex items-center justify-center"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Request Cancellation
+              </button>
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Cancellation Reason
+                </label>
+                <input
+                  type="text"
+                  value={cancellationReason}
+                  onChange={(e) => setCancellationReason(e.target.value)}
+                  placeholder="Enter cancellation reason"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-gray-900"
+                />
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div >

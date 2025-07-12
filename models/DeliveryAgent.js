@@ -65,6 +65,25 @@ const deliveryAgentSchema = new mongoose.Schema({
     reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     reviewedAt: { type: Date, default: Date.now },
   },
+  cancellationRequets: {
+    type: [
+      {
+        order: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Order"
+        },
+        message : {
+          type: String,
+          default: "Customer Unavailable"
+        },
+        cancelledAt: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ],
+    default: []
+  }
 });
 const DeliveryAgent = mongoose.models.DeliveryAgent || mongoose.model("DeliveryAgent", deliveryAgentSchema);
 module.exports = DeliveryAgent;

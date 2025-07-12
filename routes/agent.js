@@ -158,6 +158,77 @@ router.post("/:id/deliver", auth, async (req, res) => {
     }
 })
 
+router.post("/:id/request-cancel", auth, async (req, res) => {
+    const orderId = req.params.id;
+    try {
+        const order = await Order.findById(orderId);
+        console.log(order);
+        const result = await DeliveryAgent.updateOne(
+            {
+                user: req.user._id,
+                "ordersDelivered.order": { $ne: orderId }
+            },
+            {
+                $pull: {
+                    ordersAccepted: {
+                        order: orderId
+                    }
+                },
+                $push: {
+                    cancellationRequets: {
+                        order: orderId,
+                        cancelledAt: new Date(),
+                        message: req.body.message || "Customer Unavailable",
+                    }
+                }
+            }
+        );
+        // console.log(result);
+
+        order.deliveryAgent = req.user._id;
+        order.status = "pending";
+        order.cancellation = {
+            requested: true,
+            message: req.body.message || "Customer Unavailable",
+            requestedAt: new Date(),
+        };
+        order.estimatedDelivery = null;
+        await order.save();
+        console.log(order);
+        const acceptedOrders = await DeliveryAgent.find({ user: req.user._id })
+            .populate({
+                path: "ordersAccepted.order",
+                select: "subtotal tax deliveryFee total location estimatedDelivery address",
+            })
+            .populate({
+                path: "ordersAccepted.order.user",
+                select: "name address phone",
+            })
+            .populate({
+                path: "ordersAccepted.order.items.product",
+                select: "name image unit",
+            });
+        const deliveredOrders = await DeliveryAgent.find({ user: req.user._id })
+            .populate({
+                path: "ordersDelivered.order",
+                select: "subtotal tax deliveryFee total location estimatedDelivery address",
+            })
+            .populate({
+                path: "ordersDelivered.order.user",
+                select: "name address phone",
+            })
+            .populate({
+                path: "ordersDelivered.order.items.product",
+                select: "name image unit",
+            });
+
+        return res.status(200).json({ success: true, acceptedOrders, deliveredOrders });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Server Error" });
+    }
+})
+
 module.exports = router;
 // router.get("/my-orders", auth, async (req, res) => {
 //     try {

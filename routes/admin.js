@@ -133,6 +133,7 @@ router.patch("/orders/:id/cancel", adminAuth, async (req, res) => {
       initiateRefund(order._id);
     }
     order.status = "cancelled";
+    order.cancellation.reason = req.body.message || "Customer Unavailable";
     await order.save();
     return res.status(200).json({ success: true, order: order });
   } catch (error) {
@@ -140,7 +141,10 @@ router.patch("/orders/:id/cancel", adminAuth, async (req, res) => {
   }
 })
 
-// Get all users
+router.get("/agents/cancel-requests", adminAuth, async (req, res) => {
+  const requests = await Order.find({ "cancellation.requested": true });
+  res.status(200).json({ message: "sent", success: true, orders: requests });
+});
 router.get("/users", adminAuth, async (req, res) => {
   try {
     const users = await User.find({ role: "hotel" }).select("-password").sort({ createdAt: -1 })

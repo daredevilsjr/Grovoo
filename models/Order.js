@@ -70,6 +70,18 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "completed", "failed", "refunded"],
       default: "pending",
     },
+    cancellation: {
+      type: {
+        requested: {
+          type: Boolean,
+          default: false,
+        },
+        reason: {
+          type: String,
+        }
+      }
+    }
+    ,
     paymentMethod: {
       type: String,
       enum: ["razorpay", "cod"],

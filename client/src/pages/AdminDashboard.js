@@ -13,6 +13,7 @@ const AdminDashboard = () => {
   const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState("dashboard")
   const [editingProduct, setEditingProduct] = useState(null)
+  const [cancelRequests, setCancelRequests] = useState([]);
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "Vegetables",
@@ -39,6 +40,19 @@ const AdminDashboard = () => {
     }
     return;
   }
+  const handleGetCancelRequests = async () => {
+    try {
+      const response = await axios.get("/api/admin/agents/cancel-requests");
+      if (response.data.success) {
+        setCancelRequests(response.data.orders);
+        return;
+      }
+    } catch (err) {
+      toast.error(`Some Error Occurred.`);
+    }
+    return;
+  }
+
   const handleConfirmOrder = async (orderId) => {
     try {
       const response = await axios.patch(`/api/admin/orders/${orderId}/confirm`);
@@ -427,6 +441,18 @@ const AdminDashboard = () => {
               </button>
               <button
                 onClick={() => {
+                  handleGetCancelRequests();
+                  setActiveTab("cancel");
+                }}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === "cancel"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
+              >
+                Cancellation Requests
+              </button>
+              <button
+                onClick={() => {
                   getAgentsData();
                   setActiveTab("Delivery Agents");
                 }}
@@ -653,6 +679,80 @@ const AdminDashboard = () => {
                             </select> */}
                             <div className="flex gap-3 mt-4 pt-4 border-t">
                               <h3 className={`flex items-center gap-2 px-4 py-2 ${order.status === "confirmed" || order.status === "delivered" ? "bg-green-600" : "bg-red-600"} text-white rounded-lg transition-colors`}>{order.status}</h3>
+                              {order.status === "pending" && (<button
+                                onClick={() => handleConfirmOrder(order._id)}
+                                className="flex items-center gap-2 px-4 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                disabled={updateAgentStatusLoading}
+                              >
+                                <CheckCircle className="h-3 w-3" />
+                                Confirm Order
+                              </button>)}
+                              {order.status !== "delivered" && order.status !== "cancelled" && (<button
+
+                                onClick={() => handleCancelOrder(order._id)}
+                                className="flex items-center gap-2 px-4 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                                disabled={updateAgentStatusLoading}
+                              >
+                                <XCircle className="h-3 w-3" />
+                                Cancel Order
+                              </button>)}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          <p>Items: {order.items?.length || 0}</p>
+                          {order.deliveryAddress && <p>Address: {order.deliveryAddress}</p>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {activeTab === "cancel" && (
+              <div>
+                <h2 className="text-xl font-semibold mb-6">Order Management</h2>
+                {ordersLoading ? (
+                  <div className="text-center py-8">
+                    <div className="loading-spinner mx-auto mb-4"></div>
+                    <p>Loading orders...</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {cancelRequests?.length > 0 && cancelRequests.map((order) => (
+                      <div key={order._id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="font-semibold">Order #{order._id.slice(-8)}</h3>
+                            <p className="text-gray-600">Customer: {order.user?.name}</p>
+                            <p className="text-gray-600">Email: {order.user?.email}</p>
+                            <p className="text-gray-600">Phone: {order.user?.phone}</p>
+                            <p className="text-gray-600">Address: {order.user?.address}</p>
+                            <p className="text-gray-600">Gstin: {order.user?.gstin}</p>
+                            <p className="text-gray-600">Date: {new Date(order.createdAt).toLocaleDateString('en-GB')}</p>
+                            <p className="text-gray-600">Location: {order.location}</p>
+                            <p className="text-gray-600">Notes: {order.notes}</p>
+                          </div>
+                          <div>
+                            <p className="font-medium mb-2">Order Items</p>
+                            <div className="space-y-2">
+                              {order?.items?.map((item, index) => (
+                                <div key={index} className="flex justify-between items-center text-sm">
+                                  <span className="truncate pr-2">
+                                    {item.product.name} × {item.quantity}
+                                  </span>
+                                  <span className="font-medium flex-shrink-0">₹{item.total}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold">₹{order.total.toFixed(2)}</p>
+
+                            <div className="flex gap-3 mt-4 pt-4 border-t">
+                              <h3 className={`flex items-center gap-2 px-4 py-2 ${order.status === "confirmed" || order.status === "delivered" ? "bg-green-600" : "bg-red-600"} text-white rounded-lg transition-colors`}>{order.status}</h3>
+                              <p className={`flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg transition-colors`}>{order.cancellation.reason ? order.cancellation.reason : "User Unavailable"}</p>
+
                               {order.status === "pending" && (<button
                                 onClick={() => handleConfirmOrder(order._id)}
                                 className="flex items-center gap-2 px-4 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
