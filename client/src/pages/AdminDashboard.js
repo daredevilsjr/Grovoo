@@ -652,7 +652,7 @@ const AdminDashboard = () => {
                               ))}
                             </select> */}
                             <div className="flex gap-3 mt-4 pt-4 border-t">
-                              <h3 className={`flex items-center gap-2 px-4 py-2 ${order.status === "confirmed" ? "bg-green-600" : "bg-red-600"} text-white rounded-lg transition-colors`}>{order.status}</h3>
+                              <h3 className={`flex items-center gap-2 px-4 py-2 ${order.status === "confirmed" || order.status === "delivered" ? "bg-green-600" : "bg-red-600"} text-white rounded-lg transition-colors`}>{order.status}</h3>
                               {order.status === "pending" && (<button
                                 onClick={() => handleConfirmOrder(order._id)}
                                 className="flex items-center gap-2 px-4 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -661,7 +661,8 @@ const AdminDashboard = () => {
                                 <CheckCircle className="h-3 w-3" />
                                 Confirm Order
                               </button>)}
-                              {order.status === "confirmed" && (<button
+                              {order.status !== "delivered" && order.status !== "cancelled" && (<button
+
                                 onClick={() => handleCancelOrder(order._id)}
                                 className="flex items-center gap-2 px-4 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                                 disabled={updateAgentStatusLoading}
