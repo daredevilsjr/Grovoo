@@ -437,7 +437,7 @@ const AdminDashboard = () => {
               >
                 Delivery Agents
               </button>
-              <button
+              {user?.role === "owner" && (<button
                 onClick={() => {
                   getAdminData();
                   setActiveTab("Admins");
@@ -448,7 +448,7 @@ const AdminDashboard = () => {
                   }`}
               >
                 Admins
-              </button>
+              </button>)}
             </nav>
           </div>
 
@@ -991,7 +991,7 @@ const AdminDashboard = () => {
                       <option value="kg">Kilogram (kg)</option>
                       <option value="liter">Liter</option>
                       <option value="piece">Piece</option>
-                      <option value="gram">Gram</option>
+                      <option value="packet">Packet</option>
                     </select>
                   </div>
                 </div>

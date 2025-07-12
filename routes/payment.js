@@ -43,9 +43,9 @@ router.post("/create-order", auth, async (req, res) => {
       })
     }
 
-    const tax = subtotal * 0.18 // 18% GST
+    const tax = 0
     const deliveryFee = subtotal > 1000 ? 0 : 0
-    const total = subtotal + tax + deliveryFee
+    const total = subtotal + deliveryFee
 
     // Create Razorpay order
     const razorpayOrder = await razorpay.orders.create({

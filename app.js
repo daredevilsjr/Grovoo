@@ -302,7 +302,7 @@ function HomePage() {
                 <i className="fas fa-truck text-2xl"></i>
               </div>
               <h3 className="text-xl font-semibold mb-2">Fast Delivery</h3>
-              <p className="text-gray-600">Get your orders delivered within 24 hours across major cities.</p>
+              <p className="text-gray-600">Get your orders delivered within 12 hours across major cities.</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -628,8 +628,8 @@ function CartPage() {
   const [loading, setLoading] = useState(false)
 
   const subtotal = cart.reduce((total, item) => total + item.price[selectedLocation] * item.quantity, 0)
-  const tax = subtotal * 0.18 // 18% GST
-  const deliveryFee = subtotal > 1000 ? 0 : 50
+  const tax = 0
+  const deliveryFee = subtotal > 1000 ? 0 : 0
   const total = subtotal + tax + deliveryFee
 
   const handleCheckout = async () => {
@@ -742,7 +742,6 @@ function CartPage() {
                   <span>₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>GST (18%)</span>
                   <span>₹{tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
@@ -764,7 +763,7 @@ function CartPage() {
                 {loading ? <div className="loading-spinner"></div> : "Place Order"}
               </button>
 
-              <p className="text-xs text-gray-500 mt-3 text-center">Free delivery on orders above ₹1000</p>
+              <p className="text-xs text-gray-500 mt-3 text-center">Free delivery for all your order</p>
             </div>
           </div>
         </div>
@@ -1142,6 +1141,8 @@ function AdminDashboard() {
                     <option value="kg">kg</option>
                     <option value="liter">liter</option>
                     <option value="piece">piece</option>
+                    <option value="packet">packet</option>
+
                   </select>
                 </div>
               </div>
@@ -1343,13 +1344,13 @@ function ContactPage() {
                   <div>
                     <h3 className="font-medium text-gray-800">What is the minimum order value?</h3>
                     <p className="text-gray-600 text-sm mt-1">
-                      Minimum order value is ₹500. Free delivery on orders above ₹1000.
+                      Minimum order value is ₹500. Free delivery for all your order.
                     </p>
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-800">Do you accept returns?</h3>
                     <p className="text-gray-600 text-sm mt-1">
-                      Yes, we accept returns within 24 hours for fresh products.
+                      Yes, we accept returns within 3 hours for fresh products.
                     </p>
                   </div>
                 </div>

@@ -116,7 +116,7 @@ const OrderConfirmationPage = () => {
                 <span>₹{order.subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Tax (GST):</span>
+                
                 <span>₹{order.tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">

@@ -45,9 +45,9 @@ router.post("/", auth, async (req, res) => {
       await product.save();
     }
 
-    const tax = subtotal * 0.18; // 18% GST
-    const deliveryFee = subtotal > 1000 ? 0 : 50;
-    const total = subtotal + tax + deliveryFee;
+    const tax = 0
+    const deliveryFee = subtotal > 1000 ? 0 : 0;
+    const total = subtotal + deliveryFee;
 
     // Set estimated delivery (next day)
     const estimatedDelivery = new Date();

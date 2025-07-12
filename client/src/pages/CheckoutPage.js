@@ -18,9 +18,9 @@ const CheckoutPage = () => {
   const navigate = useNavigate()
 
   const subtotal = getCartTotal(selectedLocation)
-  const tax = subtotal * 0.18
-  const deliveryFee = subtotal > 1000 ? 0 : 50
-  const total = subtotal + tax + deliveryFee
+  const tax = 0
+  const deliveryFee = subtotal > 1000 ? 0 : 0
+  const total = subtotal +tax+ deliveryFee
 
   const handleInputChange = (e) => {
     setOrderData({
@@ -200,7 +200,7 @@ const CheckoutPage = () => {
                   <span>₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>GST (18%)</span>
+                  
                   <span>₹{tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
@@ -236,11 +236,11 @@ const CheckoutPage = () => {
                 </div>
               </div>
 
-              {subtotal < 1000 && (
+              {subtotal < 5 && (
                 <div className="bg-orange-50 p-4 rounded-lg mt-4">
                   <div className="flex items-center text-orange-700">
                     <i className="fas fa-info-circle mr-2"></i>
-                    <span className="text-sm">Add ₹{(1000 - subtotal).toFixed(2)} more for free delivery!</span>
+                    <span className="text-sm">Add ₹{(500 - subtotal).toFixed(2)} more for delivery!</span>
                   </div>
                 </div>
               )}

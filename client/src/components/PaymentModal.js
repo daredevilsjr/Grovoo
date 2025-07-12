@@ -12,9 +12,9 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
   const { getCartTotal, getCartItemsCount } = useCartStore()
 
   const subtotal = getCartTotal(selectedLocation)
-  const tax = subtotal * 0.18
+  const tax = 0
   const deliveryFee = subtotal > 1000 ? 0 : 0
-  const total = subtotal + tax + deliveryFee
+  const total = subtotal +tax+ deliveryFee
 
   useEffect(() => {
     // Load Razorpay script
@@ -181,7 +181,7 @@ const PaymentModal = ({ isOpen, onClose, orderData, onSuccess }) => {
                 <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">GST (18%)</span>
+                
                 <span className="font-semibold">₹{tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center">
